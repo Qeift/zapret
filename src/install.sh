@@ -272,7 +272,6 @@ sudo sed -i "/^NFQWS_OPT=\"/,/^\"/c NFQWS_OPT=\"$nfqws_options --hostlist=/opt/z
 sudo touch /opt/zapret/hostlist.txt
 
 sudo tee /opt/zapret/ipset/zapret-hostlist-auto.txt &>/dev/null << EOF
-discord.com
 roblox.com
 EOF
 
