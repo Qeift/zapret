@@ -270,12 +270,21 @@ sudo sed -i "/^NFQWS_OPT=\"/,/^\"/c NFQWS_OPT=\"$nfqws_options --hostlist=/opt/z
 sudo touch /opt/zapret/hostlist.txt
 
 sudo tee /opt/zapret/ipset/zapret-hostlist-auto.txt &>/dev/null << EOF
+# Discord
 discord.com
+discordapp.com
+discord.gg
+
+# Roblox
 roblox.com
+
+# Steam
 steampowered.com
 steamcommunity.com
 steamstatic.com
 steamserver.net
+
+# Other
 EOF
 
 sudo systemctl restart zapret
