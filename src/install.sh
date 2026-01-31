@@ -280,13 +280,11 @@ discord.gg
 discord.gift
 discord.media
 discord.new
-dis.gd
 
 # Steam
 steampowered.com
 steamcommunity.com
 steamcontent.com
-steamgames.com
 steamstatic.com
 steamusercontent.com
 steamserver.net
