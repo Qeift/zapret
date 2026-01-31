@@ -282,9 +282,6 @@ discord.media
 discord.new
 dis.gd
 
-# Roblox
-roblox.com
-
 # Steam
 steampowered.com
 steamcommunity.com
@@ -295,6 +292,9 @@ steamusercontent.com
 steamserver.net
 akamaihd.net
 akamaized.net
+
+# Roblox
+roblox.com
 
 # Others
 EOF
