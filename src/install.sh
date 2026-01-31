@@ -284,7 +284,7 @@ steamcommunity.com
 steamstatic.com
 steamserver.net
 
-# Other
+# Others
 EOF
 
 sudo systemctl restart zapret
