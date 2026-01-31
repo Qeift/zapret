@@ -282,6 +282,7 @@ roblox.com
 # Steam
 steampowered.com
 steamcommunity.com
+steamcontent.com
 steamstatic.com
 steamserver.net
 
