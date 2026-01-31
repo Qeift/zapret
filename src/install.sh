@@ -272,6 +272,7 @@ sudo touch /opt/zapret/hostlist.txt
 sudo tee /opt/zapret/ipset/zapret-hostlist-auto.txt &>/dev/null << EOF
 # Discord
 discord.com
+discord.net
 discordapp.com
 discordapp.net
 discord.co
