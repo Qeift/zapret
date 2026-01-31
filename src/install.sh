@@ -273,6 +273,9 @@ sudo tee /opt/zapret/ipset/zapret-hostlist-auto.txt &>/dev/null << EOF
 discord.com
 roblox.com
 steampowered.com
+steamcommunity.com
+steamstatic.com
+steamserver.net
 EOF
 
 sudo systemctl restart zapret
