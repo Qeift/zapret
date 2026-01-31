@@ -6,15 +6,8 @@ dev=false
 debug=false
 
 for arg in "$@"; do
-  if [ "$arg" = "--dev" ]; then
-    dev=true
-  fi
-done
-
-for arg in "$@"; do
-  if [ "$arg" = "--debug" ]; then
-    debug=true
-  fi
+  [ "$arg" = "--dev" ] && dev=true
+  [ "$arg" = "--debug" ] && debug=true
 done
 
 log_redirects="/dev/null"
@@ -213,7 +206,12 @@ sudo /tmp/zapret-v72.9/install_bin.sh &>"$log_redirects"
 
 echo -e "  ${gray}Blockcheck is being performed, this may take a few minutes...${reset}"
 
+country_code=$(curl -s https://ipinfo.io/country)
+
 blockcheck_domain="discord.com"
+
+[ "$country_code" = "RU" ] && blockcheck_domain="discord.com"
+[ "$country_code" = "TR" ] && blockcheck_domain="discord.com"
 
 if [ "$dev" = true ]; then
   nfqws_options="--dpi-desync=fakeddisorder --dpi-desync-ttl=1 --dpi-desync-autottl=-5 --dpi-desync-split-pos=1"
@@ -274,6 +272,7 @@ sudo touch /opt/zapret/hostlist.txt
 sudo tee /opt/zapret/ipset/zapret-hostlist-auto.txt &>/dev/null << EOF
 discord.com
 roblox.com
+steampowered.com
 EOF
 
 sudo systemctl restart zapret

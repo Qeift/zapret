@@ -6,15 +6,8 @@ dev=false
 debug=false
 
 for arg in "$@"; do
-  if [ "$arg" = "--dev" ]; then
-    dev=true
-  fi
-done
-
-for arg in "$@"; do
-  if [ "$arg" = "--debug" ]; then
-    debug=true
-  fi
+  [ "$arg" = "--dev" ] && dev=true
+  [ "$arg" = "--debug" ] && debug=true
 done
 
 log_redirects="/dev/null"
