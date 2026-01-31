@@ -274,6 +274,7 @@ sudo tee /opt/zapret/ipset/zapret-hostlist-auto.txt &>/dev/null << EOF
 discord.com
 discordapp.com
 discord.gg
+discord.media
 
 # Roblox
 roblox.com
