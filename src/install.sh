@@ -273,8 +273,14 @@ sudo tee /opt/zapret/ipset/zapret-hostlist-auto.txt &>/dev/null << EOF
 # Discord
 discord.com
 discordapp.com
+discordapp.net
+discord.co
+discord.dev
 discord.gg
+discord.gift
 discord.media
+discord.new
+dis.gd
 
 # Roblox
 roblox.com
@@ -283,8 +289,12 @@ roblox.com
 steampowered.com
 steamcommunity.com
 steamcontent.com
+steamgames.com
 steamstatic.com
+steamusercontent.com
 steamserver.net
+akamaihd.net
+akamaized.net
 
 # Others
 EOF
