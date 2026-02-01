@@ -285,12 +285,11 @@ discord.new
 # Steam
 steampowered.com
 steamcommunity.com
+steam-chat.com
 steamcontent.com
 steamstatic.com
 steamusercontent.com
 steamserver.net
-akamaihd.net
-akamaized.net
 
 # Roblox
 roblox.com
