@@ -6,13 +6,13 @@ dev=false
 debug=false
 
 for arg in "$@"; do
-  [ "$arg" = "--dev" ] && dev=true
-  [ "$arg" = "--debug" ] && debug=true
+  [ "${arg}" = "--dev" ] && dev=true
+  [ "${arg}" = "--debug" ] && debug=true
 done
 
 log_redirects="/dev/null"
 
-[ "$debug" = true ] && log_redirects="/dev/stdout"
+[ "${debug}" = true ] && log_redirects="/dev/stdout"
 
 reset="\e[0m"
 black="\e[30m"
@@ -24,6 +24,8 @@ magenta="\e[35m"
 cyan="\e[36m"
 white="\e[37m"
 gray="\e[90m"
+
+zapret_version="72.9"
 
 clear
 
@@ -45,41 +47,41 @@ echo -e "  ${gray}Installing dependencies...${reset}"
 if command -v apt &>/dev/null; then
   export DEBIAN_FRONTEND="noninteractive"
 
-  sudo apt update -y &>"$log_redirects"
+  sudo apt update -y &>"${log_redirects}"
 
-  sudo apt install -y bind9-dnsutils &>"$log_redirects"
-  sudo apt install -y curl &>"$log_redirects"
-  sudo apt install -y nftables &>"$log_redirects"
-  sudo apt install -y systemd-resolved &>"$log_redirects"
-  sudo apt install -y unzip &>"$log_redirects"
-  sudo apt install -y wget &>"$log_redirects"
+  sudo apt install -y bind9-dnsutils &>"${log_redirects}"
+  sudo apt install -y curl &>"${log_redirects}"
+  sudo apt install -y nftables &>"${log_redirects}"
+  sudo apt install -y systemd-resolved &>"${log_redirects}"
+  sudo apt install -y unzip &>"${log_redirects}"
+  sudo apt install -y wget &>"${log_redirects}"
 elif command -v dnf &>/dev/null; then
-  sudo dnf makecache -y &>"$log_redirects"
+  sudo dnf makecache -y &>"${log_redirects}"
 
-  sudo dnf install -y bind-utils &>"$log_redirects"
-  sudo dnf install -y curl &>"$log_redirects"
-  sudo dnf install -y nftables &>"$log_redirects"
-  sudo dnf install -y systemd-resolved &>"$log_redirects"
-  sudo dnf install -y unzip &>"$log_redirects"
-  sudo dnf install -y wget &>"$log_redirects"
+  sudo dnf install -y bind-utils &>"${log_redirects}"
+  sudo dnf install -y curl &>"${log_redirects}"
+  sudo dnf install -y nftables &>"${log_redirects}"
+  sudo dnf install -y systemd-resolved &>"${log_redirects}"
+  sudo dnf install -y unzip &>"${log_redirects}"
+  sudo dnf install -y wget &>"${log_redirects}"
 elif command -v pacman &>/dev/null; then
-  sudo pacman -Syu --noconfirm &>"$log_redirects"
+  sudo pacman -Syu --noconfirm &>"${log_redirects}"
 
-  sudo pacman -S --noconfirm bind &>"$log_redirects"
-  sudo pacman -S --noconfirm curl &>"$log_redirects"
-  sudo pacman -S --noconfirm nftables &>"$log_redirects"
-  sudo pacman -S --noconfirm systemd-resolved &>"$log_redirects"
-  sudo pacman -S --noconfirm unzip &>"$log_redirects"
-  sudo pacman -S --noconfirm wget &>"$log_redirects"
+  sudo pacman -S --noconfirm bind &>"${log_redirects}"
+  sudo pacman -S --noconfirm curl &>"${log_redirects}"
+  sudo pacman -S --noconfirm nftables &>"${log_redirects}"
+  sudo pacman -S --noconfirm systemd-resolved &>"${log_redirects}"
+  sudo pacman -S --noconfirm unzip &>"${log_redirects}"
+  sudo pacman -S --noconfirm wget &>"${log_redirects}"
 elif command -v zypper &>/dev/null; then
-  sudo zypper -n refresh &>"$log_redirects"
+  sudo zypper -n refresh &>"${log_redirects}"
 
-  sudo zypper -n install bind-utils &>"$log_redirects"
-  sudo zypper -n install curl &>"$log_redirects"
-  sudo zypper -n install nftables &>"$log_redirects"
-  sudo zypper -n install systemd-resolved &>"$log_redirects"
-  sudo zypper -n install unzip &>"$log_redirects"
-  sudo zypper -n install wget &>"$log_redirects"
+  sudo zypper -n install bind-utils &>"${log_redirects}"
+  sudo zypper -n install curl &>"${log_redirects}"
+  sudo zypper -n install nftables &>"${log_redirects}"
+  sudo zypper -n install systemd-resolved &>"${log_redirects}"
+  sudo zypper -n install unzip &>"${log_redirects}"
+  sudo zypper -n install wget &>"${log_redirects}"
 else
   echo -e "  ${red}Error: Unsupported package manager.${reset}"
   echo ""
@@ -91,18 +93,18 @@ fi
 
 echo -e "  ${gray}DNS settings are being changed...${reset}"
 
-if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"$log_redirects" \
-  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"$log_redirects" \
-  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"$log_redirects" \
-  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1001 &>"$log_redirects"; then
+if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
+  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
+  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"${log_redirects}" \
+  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1001 &>"${log_redirects}"; then
   if command -v apt &>/dev/null; then
-    sudo apt purge -y dnscrypt-proxy &>"$log_redirects"
+    sudo apt purge -y dnscrypt-proxy &>"${log_redirects}"
   elif command -v dnf &>/dev/null; then
-    sudo dnf remove -y dnscrypt-proxy &>"$log_redirects"
+    sudo dnf remove -y dnscrypt-proxy &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
-    sudo pacman -Rns --noconfirm dnscrypt-proxy &>"$log_redirects"
+    sudo pacman -Rns --noconfirm dnscrypt-proxy &>"${log_redirects}"
   elif command -v zypper &>/dev/null; then
-    sudo zypper -n remove -u dnscrypt-proxy &>"$log_redirects"
+    sudo zypper -n remove -u dnscrypt-proxy &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported package manager.${reset}"
     echo ""
@@ -110,7 +112,7 @@ if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"$log_redir
     exit 1
   fi
 
-  sudo systemctl enable systemd-resolved &>"$log_redirects"
+  sudo systemctl enable systemd-resolved &>"${log_redirects}"
   sudo systemctl start systemd-resolved
 
   sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
@@ -123,20 +125,20 @@ DNS=2606:4700:4700::1001#one.one.one.one
 DNSOverTLS=yes
 EOF
 
-  sudo chattr -i /etc/resolv.conf &>"$log_redirects"
+  sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
 
   [ -e /run/systemd/resolve/stub-resolv.conf ] && sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
   sudo systemctl restart systemd-resolved
 else
   if command -v apt &>/dev/null; then
-    sudo apt install -y dnscrypt-proxy &>"$log_redirects"
+    sudo apt install -y dnscrypt-proxy &>"${log_redirects}"
   elif command -v dnf &>/dev/null; then
-    sudo dnf install -y dnscrypt-proxy &>"$log_redirects"
+    sudo dnf install -y dnscrypt-proxy &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
-    sudo pacman -S --noconfirm dnscrypt-proxy &>"$log_redirects"
+    sudo pacman -S --noconfirm dnscrypt-proxy &>"${log_redirects}"
   elif command -v zypper &>/dev/null; then
-    sudo zypper -n install dnscrypt-proxy &>"$log_redirects"
+    sudo zypper -n install dnscrypt-proxy &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported package manager.${reset}"
     echo ""
@@ -144,10 +146,10 @@ else
     exit 1
   fi
 
-  sudo systemctl enable systemd-resolved &>"$log_redirects"
+  sudo systemctl enable systemd-resolved &>"${log_redirects}"
   sudo systemctl start systemd-resolved
 
-  sudo systemctl enable dnscrypt-proxy &>"$log_redirects"
+  sudo systemctl enable dnscrypt-proxy &>"${log_redirects}"
   sudo systemctl start dnscrypt-proxy
 
   sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
@@ -158,7 +160,7 @@ DNS=[::1]:5300
 DNSOverTLS=no
 EOF
 
-  sudo chattr -i /etc/resolv.conf &>"$log_redirects"
+  sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
 
   [ -e /run/systemd/resolve/stub-resolv.conf ] && sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
@@ -183,24 +185,25 @@ fi
 
 echo -e "  ${gray}Downloading Zapret...${reset}"
 
-sudo rm -rf /tmp/zapret-v72.9
-sudo rm -rf /tmp/zapret-v72.9.zip
+sudo rm -rf /tmp/zapret
+sudo rm -rf /tmp/zapret.zip
 
-sudo wget -P /tmp https://github.com/bol-van/zapret/releases/download/v72.9/zapret-v72.9.zip &>"$log_redirects"
+sudo wget -O /tmp/zapret.zip "https://github.com/bol-van/zapret/releases/download/v${zapret_version}/zapret-v${zapret_version}.zip" &>"${log_redirects}"
 
-sudo unzip -d /tmp /tmp/zapret-v72.9.zip &>"$log_redirects"
+sudo unzip -d /tmp /tmp/zapret.zip &>"${log_redirects}"
+sudo mv "/tmp/zapret-v${zapret_version}" /tmp/zapret
 
-sudo rm -rf /tmp/zapret-v72.9.zip
+sudo rm -rf /tmp/zapret.zip
 
 # 4. Prepare for installation
 
 echo -e "  ${gray}Preparing for installation...${reset}"
 
-printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"$log_redirects"
+printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
 sudo rm -rf /opt/zapret
 
-printf "\n\n" | sudo /tmp/zapret-v72.9/install_prereq.sh &>"$log_redirects"
-sudo /tmp/zapret-v72.9/install_bin.sh &>"$log_redirects"
+printf "\n\n" | sudo /tmp/zapret/install_prereq.sh &>"${log_redirects}"
+sudo /tmp/zapret/install_bin.sh &>"${log_redirects}"
 
 # 5. Do Blockcheck
 
@@ -210,20 +213,20 @@ country_code=$(curl -s https://ipinfo.io/country)
 
 blockcheck_domain="discord.com"
 
-[ "$country_code" = "RU" ] && blockcheck_domain="discord.com"
-[ "$country_code" = "TR" ] && blockcheck_domain="discord.com"
+[ "${country_code}" = "RU" ] && blockcheck_domain="discord.com"
+[ "${country_code}" = "TR" ] && blockcheck_domain="discord.com"
 
-if [ "$dev" = true ]; then
+if [ "${dev}" = true ]; then
   nfqws_options="--dpi-desync=fakeddisorder --dpi-desync-ttl=1 --dpi-desync-autottl=-5 --dpi-desync-split-pos=1"
 else
-  blockcheck_results=$(printf "$blockcheck_domain\n\n\n\n\n\n\n\n" | sudo /tmp/zapret-v72.9/blockcheck.sh 2>"$log_redirects")
+  blockcheck_results=$(printf "${blockcheck_domain}\n\n\n\n\n\n\n\n" | sudo /tmp/zapret/blockcheck.sh 2>"${log_redirects}")
 
-  [ "$debug" = true ] && echo "$blockcheck_results"
+  [ "${debug}" = true ] && echo "${blockcheck_results}"
 
-  nfqws_options=$(echo "$blockcheck_results" | grep "curl_test_https_tls12 ipv4 $blockcheck_domain : nfqws" | tail -n1 | sed "s/.*nfqws //")
+  nfqws_options=$(echo "${blockcheck_results}" | grep "curl_test_https_tls12 ipv4 ${blockcheck_domain} : nfqws" | tail -n1 | sed "s/.*nfqws //")
 fi
 
-if [[ "$blockcheck_results" == *"nftables queue support is not available"* ]]; then
+if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]]; then
   echo -e "  ${red}Error: You need to update your system.${reset}"
 
   if command -v apt &>/dev/null; then
@@ -241,20 +244,20 @@ if [[ "$blockcheck_results" == *"nftables queue support is not available"* ]]; t
 
   echo ""
 
-  printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"$log_redirects"
+  printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
   sudo rm -rf /opt/zapret
-  sudo rm -rf /tmp/zapret-v72.9
+  sudo rm -rf /tmp/zapret
 
   exit 1
 fi
 
-if [[ "$blockcheck_results" == *"curl_test_https_tls12 ipv4 $blockcheck_domain : working without bypass"* ]]; then
+if [[ "${blockcheck_results}" == *"curl_test_https_tls12 ipv4 ${blockcheck_domain} : working without bypass"* ]]; then
   echo -e "  ${gray}No access restrictions were detected.${reset}"
   echo ""
 
-  printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"$log_redirects"
+  printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
   sudo rm -rf /opt/zapret
-  sudo rm -rf /tmp/zapret-v72.9
+  sudo rm -rf /tmp/zapret
 
   exit 0
 fi
@@ -263,9 +266,9 @@ fi
 
 echo -e "  ${gray}Installing Zapret...${reset}"
 
-printf "Y\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret-v72.9/install_easy.sh &>"$log_redirects"
+printf "Y\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
 
-sudo sed -i "/^NFQWS_OPT=\"/,/^\"/c NFQWS_OPT=\"$nfqws_options --hostlist=/opt/zapret/hostlist.txt --hostlist-auto=/opt/zapret/ipset/zapret-hostlist-auto.txt\"" /opt/zapret/config
+sudo sed -i "/^NFQWS_OPT=\"/,/^\"/c NFQWS_OPT=\"${nfqws_options} --hostlist=/opt/zapret/hostlist.txt --hostlist-auto=/opt/zapret/ipset/zapret-hostlist-auto.txt\"" /opt/zapret/config
 
 sudo touch /opt/zapret/hostlist.txt
 
@@ -303,6 +306,13 @@ sudo systemctl restart zapret
 
 echo -e "  ${gray}Zapret was successfully installed.${reset}"
 
-sudo rm -rf /tmp/zapret-v72.9
+sudo rm -rf /tmp/zapret
+
+curl -X POST "https://metrics--api.keift.co/zapret" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event": "INSTALLATION_SUCCESSFUL",
+    "message": null
+  }' &>"${log_redirects}"
 
 echo ""

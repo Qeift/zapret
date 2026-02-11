@@ -6,13 +6,13 @@ dev=false
 debug=false
 
 for arg in "$@"; do
-  [ "$arg" = "--dev" ] && dev=true
-  [ "$arg" = "--debug" ] && debug=true
+  [ "${arg}" = "--dev" ] && dev=true
+  [ "${arg}" = "--debug" ] && debug=true
 done
 
 log_redirects="/dev/null"
 
-[ "$debug" = true ] && log_redirects="/dev/stdout"
+[ "${debug}" = true ] && log_redirects="/dev/stdout"
 
 reset="\e[0m"
 black="\e[30m"
@@ -40,7 +40,7 @@ fi
 
 echo -e "  ${gray}Uninstalling Zapret...${reset}"
 
-printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"$log_redirects"
+printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
 
 sudo rm -rf /opt/zapret
 
