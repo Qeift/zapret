@@ -313,7 +313,7 @@ echo -e "  ${gray}Zapret was successfully installed.${reset}"
 
 sudo rm -rf /tmp/zapret
 
-curl -X POST https://metrics--api.keift.co/zapret \
+curl --max-time 10 -X POST https://metrics--api.keift.co/zapret \
   -H "Content-Type: application/json" \
   -d "{
     \"event\": \"ZAPRET_INSTALLATION_SUCCESSFUL\",
