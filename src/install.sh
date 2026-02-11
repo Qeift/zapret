@@ -112,6 +112,8 @@ if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redi
     exit 1
   fi
 
+  dns_resolver="systemd-resolved"
+
   sudo systemctl enable systemd-resolved &>"${log_redirects}"
   sudo systemctl start systemd-resolved
 
@@ -145,6 +147,8 @@ else
 
     exit 1
   fi
+
+  dns_resolver="dnscrypt-proxy"
 
   sudo systemctl enable systemd-resolved &>"${log_redirects}"
   sudo systemctl start systemd-resolved
@@ -191,6 +195,7 @@ sudo rm -rf /tmp/zapret.zip
 sudo wget -O /tmp/zapret.zip "https://github.com/bol-van/zapret/releases/download/v${zapret_version}/zapret-v${zapret_version}.zip" &>"${log_redirects}"
 
 sudo unzip -d /tmp /tmp/zapret.zip &>"${log_redirects}"
+
 sudo mv "/tmp/zapret-v${zapret_version}" /tmp/zapret
 
 sudo rm -rf /tmp/zapret.zip
@@ -308,11 +313,15 @@ echo -e "  ${gray}Zapret was successfully installed.${reset}"
 
 sudo rm -rf /tmp/zapret
 
-curl -X POST "https://metrics--api.keift.co/zapret" \
+curl -X POST https://metrics--api.keift.co/zapret \
   -H "Content-Type: application/json" \
-  -d '{
-    "event": "INSTALLATION_SUCCESSFUL",
-    "message": null
-  }' &>"${log_redirects}"
+  -d "{
+    \"event\": \"ZAPRET_INSTALLATION_SUCCESSFUL\",
+    \"data\": {
+      \"dns_resolver\": \"${dns_resolver}\",
+      \"blockcheck_domain\": \"${blockcheck_domain}\",
+      \"nfqws_options\": \"${nfqws_options}\"
+    }
+  }" &>"${log_redirects}"
 
 echo ""
