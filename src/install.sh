@@ -36,7 +36,6 @@ send_metrics() {
       \"event\": \"${event}\",
       \"data\": {
         \"dns_resolver\": \"${dns_resolver}\",
-        \"blockcheck_domain\": \"${blockcheck_domain}\",
         \"nfqws_options\": \"${nfqws_options}\"
       }
     }" &>"${log_redirects}"
