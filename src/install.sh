@@ -29,16 +29,28 @@ zapret_version="72.9"
 
 send_metrics() {
   local event="$1"
+  local domain_http=$(curl --max-time 10 -s -I "https://${blockcheck_domain}" | grep -E "^HTTP/")
+
+  local payload=$(jq -n \
+    --arg event "$event" \
+    --arg dns_resolver "$dns_resolver" \
+    --arg blockcheck_domain "$blockcheck_domain" \
+    --arg domain_http "$domain_http" \
+    --arg nfqws_options "$nfqws_options" \
+    '{
+      event: $event,
+      data: {
+        dns_resolver: $dns_resolver,
+        blockcheck_domain: $blockcheck_domain,
+        domain_http: $domain_http,
+        nfqws_options: $nfqws_options
+      }
+    }'
+  )
 
   curl --max-time 10 -X POST https://metrics--api.keift.co/zapret \
     -H "Content-Type: application/json" \
-    -d "{
-      \"event\": \"${event}\",
-      \"data\": {
-        \"dns_resolver\": \"${dns_resolver}\",
-        \"nfqws_options\": \"${nfqws_options}\"
-      }
-    }" &>"${log_redirects}"
+    -d "${payload}" &>"${log_redirects}"
 }
 
 clear
@@ -65,6 +77,7 @@ if command -v apt &>/dev/null; then
 
   sudo apt install -y bind9-dnsutils &>"${log_redirects}"
   sudo apt install -y curl &>"${log_redirects}"
+  sudo apt install -y jq &>"${log_redirects}"
   sudo apt install -y nftables &>"${log_redirects}"
   sudo apt install -y systemd-resolved &>"${log_redirects}"
   sudo apt install -y unzip &>"${log_redirects}"
@@ -74,6 +87,7 @@ elif command -v dnf &>/dev/null; then
 
   sudo dnf install -y bind-utils &>"${log_redirects}"
   sudo dnf install -y curl &>"${log_redirects}"
+  sudo dnf install -y jq &>"${log_redirects}"
   sudo dnf install -y nftables &>"${log_redirects}"
   sudo dnf install -y systemd-resolved &>"${log_redirects}"
   sudo dnf install -y unzip &>"${log_redirects}"
@@ -83,6 +97,7 @@ elif command -v pacman &>/dev/null; then
 
   sudo pacman -S --noconfirm bind &>"${log_redirects}"
   sudo pacman -S --noconfirm curl &>"${log_redirects}"
+  sudo pacman -S --noconfirm jq &>"${log_redirects}"
   sudo pacman -S --noconfirm nftables &>"${log_redirects}"
   sudo pacman -S --noconfirm systemd-resolved &>"${log_redirects}"
   sudo pacman -S --noconfirm unzip &>"${log_redirects}"
@@ -92,6 +107,7 @@ elif command -v zypper &>/dev/null; then
 
   sudo zypper -n install bind-utils &>"${log_redirects}"
   sudo zypper -n install curl &>"${log_redirects}"
+  sudo zypper -n install jq &>"${log_redirects}"
   sudo zypper -n install nftables &>"${log_redirects}"
   sudo zypper -n install systemd-resolved &>"${log_redirects}"
   sudo zypper -n install unzip &>"${log_redirects}"
@@ -228,7 +244,7 @@ sudo /tmp/zapret/install_bin.sh &>"${log_redirects}"
 
 echo -e "  ${gray}Blockcheck is being performed, this may take a few minutes...${reset}"
 
-country_code=$(curl -s https://ipinfo.io/country)
+country_code=$(curl --max-time 10 -s https://ipinfo.io/country)
 
 blockcheck_domain="discord.com"
 
@@ -243,7 +259,7 @@ else
 
   [ "${debug}" = true ] && echo "${blockcheck_results}"
 
-  nfqws_options=$(echo "${blockcheck_results}" | grep "curl_test_https_tls12 ipv4 ${blockcheck_domain} : nfqws" | tail -n1 | sed "s/.*nfqws //")
+  nfqws_options=$(echo "${blockcheck_results}" | grep "curl_test_https_tls12 ipv4 ${blockcheck_domain} : nfqws" | tail -n 1 | sed "s/.*nfqws //")
 fi
 
 if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]]; then
