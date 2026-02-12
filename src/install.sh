@@ -27,6 +27,21 @@ gray="\e[90m"
 
 zapret_version="72.9"
 
+send_metrics() {
+  local event="$1"
+
+  curl --max-time 10 -X POST https://metrics--api.keift.co/zapret \
+    -H "Content-Type: application/json" \
+    -d "{
+      \"event\": \"${event}\",
+      \"data\": {
+        \"dns_resolver\": \"${dns_resolver}\",
+        \"blockcheck_domain\": \"${blockcheck_domain}\",
+        \"nfqws_options\": \"${nfqws_options}\"
+      }
+    }" &>"${log_redirects}"
+}
+
 clear
 
 echo ""
@@ -232,6 +247,10 @@ else
 fi
 
 if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]]; then
+  printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
+  sudo rm -rf /opt/zapret
+  sudo rm -rf /tmp/zapret
+
   echo -e "  ${red}Error: You need to update your system.${reset}"
 
   if command -v apt &>/dev/null; then
@@ -249,20 +268,19 @@ if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]];
 
   echo ""
 
-  printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
-  sudo rm -rf /opt/zapret
-  sudo rm -rf /tmp/zapret
-
   exit 1
 fi
 
 if [[ "${blockcheck_results}" == *"curl_test_https_tls12 ipv4 ${blockcheck_domain} : working without bypass"* ]]; then
-  echo -e "  ${gray}No access restrictions were detected.${reset}"
-  echo ""
-
   printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
   sudo rm -rf /opt/zapret
   sudo rm -rf /tmp/zapret
+
+  echo -e "  ${gray}No access restrictions were detected.${reset}"
+
+  send_metrics ZAPRET_NO_ACCESS_RESTRICTIONS_WERE_DETECTED
+
+  echo ""
 
   exit 0
 fi
@@ -313,15 +331,6 @@ echo -e "  ${gray}Zapret was successfully installed.${reset}"
 
 sudo rm -rf /tmp/zapret
 
-curl --max-time 10 -X POST https://metrics--api.keift.co/zapret \
-  -H "Content-Type: application/json" \
-  -d "{
-    \"event\": \"ZAPRET_INSTALLATION_SUCCESSFUL\",
-    \"data\": {
-      \"dns_resolver\": \"${dns_resolver}\",
-      \"blockcheck_domain\": \"${blockcheck_domain}\",
-      \"nfqws_options\": \"${nfqws_options}\"
-    }
-  }" &>"${log_redirects}"
+send_metrics ZAPRET_INSTALLATION_SUCCESSFUL
 
 echo ""
