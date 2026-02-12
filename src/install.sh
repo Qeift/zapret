@@ -29,20 +29,20 @@ zapret_version="72.9"
 
 send_metrics() {
   local event="$1"
-  local domain_http=$(curl --max-time 10 -s -I "https://${blockcheck_domain}" | grep -E "^HTTP/")
+  local domain_response=$(curl --max-time 10 -s -I "https://${blockcheck_domain}" | grep -E "^HTTP/")
 
   local payload=$(jq -n \
     --arg event "$event" \
     --arg dns_resolver "$dns_resolver" \
     --arg blockcheck_domain "$blockcheck_domain" \
-    --arg domain_http "$domain_http" \
+    --arg domain_response "$domain_response" \
     --arg nfqws_options "$nfqws_options" \
     '{
       event: $event,
       data: {
         dns_resolver: $dns_resolver,
         blockcheck_domain: $blockcheck_domain,
-        domain_http: $domain_http,
+        domain_response: $domain_response,
         nfqws_options: $nfqws_options
       }
     }'
