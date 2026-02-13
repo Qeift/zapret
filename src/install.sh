@@ -51,7 +51,7 @@ send_metrics() {
 
   echo ""
   echo -e "  ${gray}Would you like to share the results of this tool with ${blue}Keift${gray}?${reset}"
-  echo -ne "  ${gray}This will help us improve this tool faster. (${green}Y${gray}/${red}N${gray}) ${reset}"
+  echo -ne "  ${gray}This will help us improve this tool faster. [${green}Y${gray}/${red}N${gray}] ${reset}"
 
   if [ -t 0 ]; then
     read metrics_answer
@@ -66,6 +66,9 @@ send_metrics() {
     curl --max-time 10 -X POST https://metrics--api.keift.co/zapret \
       -H "Content-Type: application/json" \
       -d "${payload}" &>"${log_redirects}"
+  else
+    echo ""
+    echo -e "  ${gray}That’s okay, nothing was shared.${reset}"
   fi
 }
 
