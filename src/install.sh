@@ -15,6 +15,15 @@ log_redirects="/dev/null"
 [ "${debug}" = true ] && log_redirects="/dev/stdout"
 
 reset="\e[0m"
+bold="\x1b[1m"
+dim="\x1b[2m"
+italic="\x1b[3m"
+underline="\x1b[4m"
+blink="\x1b[5m"
+inverse="\x1b[7m"
+hidden="\x1b[8m"
+strikethrough="\x1b[9m"
+
 black="\e[30m"
 red="\e[31m"
 green="\e[32m"
@@ -25,6 +34,7 @@ cyan="\e[36m"
 white="\e[37m"
 gray="\e[90m"
 
+version="1.1"
 zapret_version="72.9"
 
 send_metrics() {
@@ -75,7 +85,8 @@ send_metrics() {
 clear
 
 echo ""
-echo -e "  ${blue}Keift ${cyan}Install Zapret${reset}"
+echo -e "  ${blue}Keift ${cyan}Install Zapret ${gray}v${version}${reset}"
+echo -e "  ${magenta}${italic}Long live internet freedom!${reset}"
 echo ""
 
 if ! command -v systemctl &>/dev/null; then
