@@ -49,12 +49,7 @@ send_metrics() {
       }'
   )
 
-  echo ""
-  echo -e "  ${gray}Would you like to share the results of this tool with ${blue}Keift${gray}?${reset}"
-  echo -ne "  ${gray}This will help us improve this tool faster. (${green}Y${gray}/${red}N${gray}) ${reset}"
-  read metrics_answer
-
-  [ "${metrics_answer,,}" = "y" ] && curl --max-time 10 -X POST https://metrics--api.keift.co/zapret \
+  curl --max-time 10 -X POST https://metrics--api.keift.co/zapret \
     -H "Content-Type: application/json" \
     -d "${payload}" &>"${log_redirects}"
 }
