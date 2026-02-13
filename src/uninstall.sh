@@ -5,7 +5,7 @@ sudo -v
 dev=false
 debug=false
 
-for arg in "${@}"; do
+for arg in "$@"; do
   [ "${arg}" = "--dev" ] && dev=true
   [ "${arg}" = "--debug" ] && debug=true
 done
