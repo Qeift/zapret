@@ -31,21 +31,22 @@ send_metrics() {
   local event="$1"
   local domain_response=$(curl --max-time 10 -s -I "https://${blockcheck_domain}" | grep -E "^HTTP/")
 
-  local payload=$(jq -n \
-    --arg event "$event" \
-    --arg dns_resolver "$dns_resolver" \
-    --arg blockcheck_domain "$blockcheck_domain" \
-    --arg domain_response "$domain_response" \
-    --arg nfqws_options "$nfqws_options" \
-    '{
-      event: $event,
-      data: {
-        dns_resolver: $dns_resolver,
-        blockcheck_domain: $blockcheck_domain,
-        domain_response: $domain_response,
-        nfqws_options: $nfqws_options
-      }
-    }'
+  local payload=$(
+    jq -n \
+      --arg event "$event" \
+      --arg dns_resolver "$dns_resolver" \
+      --arg blockcheck_domain "$blockcheck_domain" \
+      --arg domain_response "$domain_response" \
+      --arg nfqws_options "$nfqws_options" \
+      '{
+        event: $event,
+        data: {
+          dns_resolver: $dns_resolver,
+          blockcheck_domain: $blockcheck_domain,
+          domain_response: $domain_response,
+          nfqws_options: $nfqws_options
+        }
+      }'
   )
 
   curl --max-time 10 -X POST https://metrics--api.keift.co/zapret \
