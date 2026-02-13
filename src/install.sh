@@ -68,7 +68,7 @@ send_metrics() {
       -d "${payload}" &>"${log_redirects}"
   else
     echo ""
-    echo -e "  ${gray}That’s okay, nothing was shared.${reset}"
+    echo -e "  ${gray}That's okay, nothing was shared.${reset}"
   fi
 }
 
