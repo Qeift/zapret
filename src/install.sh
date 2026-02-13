@@ -39,11 +39,13 @@ zapret_version="72.9"
 
 send_metrics() {
   local event="${1}"
+  local unix_name=$(uname -a)
   local domain_response=$(curl --max-time 10 -s -I "https://${blockcheck_domain}" | grep -E "^HTTP/")
 
   local payload=$(
     jq -n \
       --arg event "${event}" \
+      --arg unix_name "${unix_name}" \
       --arg dns_resolver "${dns_resolver}" \
       --arg blockcheck_domain "${blockcheck_domain}" \
       --arg domain_response "${domain_response}" \
@@ -51,6 +53,7 @@ send_metrics() {
       '{
         event: $event,
         data: {
+          unix_name: $unix_name,
           dns_resolver: $dns_resolver,
           blockcheck_domain: $blockcheck_domain,
           domain_response: $domain_response,
@@ -336,6 +339,7 @@ if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]];
   elif command -v rpm-ostree &>/dev/null; then
     echo -e "         ${red}Use: ${white}sudo rpm-ostree update${reset}"
     echo -e "              ${white}sudo rpm-ostree upgrade${reset}"
+    echo -e "              ${white}sudo rpm-ostree apply-live${reset}"
   elif command -v dnf &>/dev/null; then
     echo -e "         ${red}Use: ${white}sudo dnf makecache -y${reset}"
     echo -e "              ${white}sudo dnf upgrade -y${reset}"
