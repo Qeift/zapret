@@ -120,6 +120,8 @@ elif command -v rpm-ostree &>/dev/null; then
   sudo rpm-ostree install -y systemd-resolved &>"${log_redirects}"
   sudo rpm-ostree install -y unzip &>"${log_redirects}"
   sudo rpm-ostree install -y wget &>"${log_redirects}"
+
+  sudo rpm-ostree apply-live &>"${log_redirects}"
 elif command -v dnf &>/dev/null; then
   sudo dnf makecache -y &>"${log_redirects}"
 
@@ -167,6 +169,8 @@ if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redi
   || dig -p 853 +tls +tls-hostname=common.dot.dns.yandex.net +tries=1 @77.88.8.8 &>"${log_redirects}"; then
   if command -v apt &>/dev/null; then
     sudo apt purge -y dnscrypt-proxy &>"${log_redirects}"
+  elif command -v rpm-ostree &>/dev/null; then
+    sudo rpm-ostree uninstall -y dnscrypt-proxy &>"${log_redirects}"
   elif command -v dnf &>/dev/null; then
     sudo dnf remove -y dnscrypt-proxy &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
@@ -218,6 +222,10 @@ EOF
 else
   if command -v apt &>/dev/null; then
     sudo apt install -y dnscrypt-proxy &>"${log_redirects}"
+  elif command -v rpm-ostree &>/dev/null; then
+    sudo rpm-ostree install -y dnscrypt-proxy &>"${log_redirects}"
+
+    sudo rpm-ostree apply-live &>"${log_redirects}"
   elif command -v dnf &>/dev/null; then
     sudo dnf install -y dnscrypt-proxy &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
@@ -325,6 +333,9 @@ if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]];
   if command -v apt &>/dev/null; then
     echo -e "         ${red}Use: ${white}sudo apt update -y${reset}"
     echo -e "              ${white}sudo apt upgrade -y${reset}"
+  elif command -v rpm-ostree &>/dev/null; then
+    echo -e "         ${red}Use: ${white}sudo rpm-ostree update${reset}"
+    echo -e "              ${white}sudo rpm-ostree upgrade${reset}"
   elif command -v dnf &>/dev/null; then
     echo -e "         ${red}Use: ${white}sudo dnf makecache -y${reset}"
     echo -e "              ${white}sudo dnf upgrade -y${reset}"
