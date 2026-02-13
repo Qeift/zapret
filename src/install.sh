@@ -49,9 +49,24 @@ send_metrics() {
       }'
   )
 
-  curl --max-time 10 -X POST https://metrics--api.keift.co/zapret \
-    -H "Content-Type: application/json" \
-    -d "${payload}" &>"${log_redirects}"
+  echo ""
+  echo -e "  ${gray}Would you like to share the results of this tool with ${blue}Keift${gray}?${reset}"
+  echo -ne "  ${gray}This will help us improve this tool faster. (${green}Y${gray}/${red}N${gray}) ${reset}"
+
+  if [ -t 0 ]; then
+    read metrics_answer
+  else
+    read metrics_answer < /dev/tty
+  fi
+
+  if [ "${metrics_answer,,}" = "y" ]; then
+    echo ""
+    echo -e "  ${gray}Thank you for your feedback.${reset}"
+
+    curl --max-time 10 -X POST https://metrics--api.keift.co/zapret \
+      -H "Content-Type: application/json" \
+      -d "${payload}" &>"${log_redirects}"
+  fi
 }
 
 clear
