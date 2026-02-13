@@ -5,7 +5,7 @@ sudo -v
 dev=false
 debug=false
 
-for arg in "$@"; do
+for arg in "${@}"; do
   [ "${arg}" = "--dev" ] && dev=true
   [ "${arg}" = "--debug" ] && debug=true
 done
@@ -28,16 +28,16 @@ gray="\e[90m"
 zapret_version="72.9"
 
 send_metrics() {
-  local event="$1"
+  local event="${1}"
   local domain_response=$(curl --max-time 10 -s -I "https://${blockcheck_domain}" | grep -E "^HTTP/")
 
   local payload=$(
     jq -n \
-      --arg event "$event" \
-      --arg dns_resolver "$dns_resolver" \
-      --arg blockcheck_domain "$blockcheck_domain" \
-      --arg domain_response "$domain_response" \
-      --arg nfqws_options "$nfqws_options" \
+      --arg event "${event}" \
+      --arg dns_resolver "${dns_resolver}" \
+      --arg blockcheck_domain "${blockcheck_domain}" \
+      --arg domain_response "${domain_response}" \
+      --arg nfqws_options "${nfqws_options}" \
       '{
         event: $event,
         data: {
