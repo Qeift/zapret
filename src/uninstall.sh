@@ -34,13 +34,10 @@ cyan="\e[36m"
 white="\e[37m"
 gray="\e[90m"
 
-version="1.1"
-
 clear
 
 echo ""
-echo -e "  ${blue}Keift ${cyan}Uninstall Zapret ${gray}v${version}${reset}"
-echo -e "  ${magenta}${italic}Long live internet freedom!${reset}"
+echo -e "  ${blue}Keift ${cyan}Uninstall Zapret${reset}"
 echo ""
 
 if [ ! -d "/opt/zapret" ]; then

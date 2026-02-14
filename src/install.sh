@@ -34,7 +34,6 @@ cyan="\e[36m"
 white="\e[37m"
 gray="\e[90m"
 
-version="1.1"
 zapret_version="72.9"
 
 send_metrics() {
@@ -88,8 +87,7 @@ send_metrics() {
 clear
 
 echo ""
-echo -e "  ${blue}Keift ${cyan}Install Zapret ${gray}v${version}${reset}"
-echo -e "  ${magenta}${italic}Long live internet freedom!${reset}"
+echo -e "  ${blue}Keift ${cyan}Install Zapret${reset}"
 echo ""
 
 if ! command -v systemctl &>/dev/null; then
