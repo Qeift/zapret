@@ -315,7 +315,7 @@ else
 
   [ "${debug}" = true ] && echo "${blockcheck_results}"
 
-  nfqws_options=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/,\$p" | grep "curl_test_https_tls12 ipv4 ${blockcheck_domain} : nfqws" | sed "s/.*nfqws //" | tr " " "\n" | tac | awk -F= "NF && !seen[\$1]++" | tac | tail -n 62 | tr "\n" " " | sed "s/[[:space:]]*\$//")
+  nfqws_options=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/,\$p" | grep -E "curl_test_http|curl_test_https_tls12" | grep "ipv4 ${blockcheck_domain} : nfqws" | sed "s/.*nfqws //" | tr " " "\n" | tac | awk -F= "NF && !seen[\$1]++" | tac | tail -n 62 | tr "\n" " " | sed "s/[[:space:]]*\$//")
 fi
 
 if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]]; then
@@ -343,10 +343,8 @@ if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]];
   exit 1
 fi
 
-if echo "${blockcheck_results}" \
-   | grep "curl_test_https_tls12 ipv4 ${blockcheck_domain}" \
-   | tail -n 1 \
-   | grep -q "working without bypass"; then
+if echo "${blockcheck_results}" | grep -q "curl_test_http ipv4 ${blockcheck_domain} : working without bypass" \
+   && echo "${blockcheck_results}" | grep -q "curl_test_https_tls12 ipv4 ${blockcheck_domain} : working without bypass"; then
   printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
   sudo rm -rf /opt/zapret
   sudo rm -rf /tmp/zapret
