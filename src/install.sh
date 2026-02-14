@@ -37,30 +37,6 @@ gray="\e[90m"
 zapret_version="72.9"
 
 send_metrics() {
-  local event="${1}"
-  local unix_name=$(uname -a)
-  local domain_response=$(curl --max-time 10 -sS -I "https://${blockcheck_domain}" 2>&1 | head -n 1)
-
-  local payload=$(
-    jq -n \
-      --arg event "${event}" \
-      --arg unix_name "${unix_name}" \
-      --arg dns_resolver "${dns_resolver}" \
-      --arg blockcheck_domain "${blockcheck_domain}" \
-      --arg domain_response "${domain_response}" \
-      --arg nfqws_options "${nfqws_options}" \
-      '{
-        event: $event,
-        data: {
-          unix_name: $unix_name,
-          dns_resolver: $dns_resolver,
-          blockcheck_domain: $blockcheck_domain,
-          domain_response: $domain_response,
-          nfqws_options: $nfqws_options
-        }
-      }'
-  )
-
   echo ""
   echo -e "  ${gray}Would you like to share the results with ${blue}Keift${gray}?${reset}"
   echo -ne "  ${gray}This helps us improve this tool. [${green}Y${gray}/${red}N${gray}] ${reset}"
@@ -74,6 +50,30 @@ send_metrics() {
   if [ "${metrics_answer,,}" = "y" ]; then
     echo ""
     echo -e "  ${gray}Thank you for your feedback.${reset}"
+
+    local event="${1}"
+    local unix_name=$(uname -a)
+    local domain_response=$(curl --max-time 10 -sS -I "https://${blockcheck_domain}" 2>&1 | head -n 1)
+
+    local payload=$(
+      jq -n \
+        --arg event "${event}" \
+        --arg unix_name "${unix_name}" \
+        --arg dns_resolver "${dns_resolver}" \
+        --arg blockcheck_domain "${blockcheck_domain}" \
+        --arg domain_response "${domain_response}" \
+        --arg nfqws_options "${nfqws_options}" \
+        '{
+          event: $event,
+          data: {
+            unix_name: $unix_name,
+            dns_resolver: $dns_resolver,
+            blockcheck_domain: $blockcheck_domain,
+            domain_response: $domain_response,
+            nfqws_options: $nfqws_options
+          }
+        }'
+    )
 
     curl --max-time 10 -X POST https://metrics--api.keift.co/zapret \
       -H "Content-Type: application/json" \
