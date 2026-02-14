@@ -112,17 +112,6 @@ if command -v apt &>/dev/null; then
   sudo apt install -y nftables &>"${log_redirects}"
   sudo apt install -y unzip &>"${log_redirects}"
   sudo apt install -y wget &>"${log_redirects}"
-elif command -v rpm-ostree &>/dev/null; then
-  sudo rpm-ostree update &>"${log_redirects}"
-
-  sudo rpm-ostree install -y bind-utils &>"${log_redirects}"
-  sudo rpm-ostree install -y curl &>"${log_redirects}"
-  sudo rpm-ostree install -y jq &>"${log_redirects}"
-  sudo rpm-ostree install -y nftables &>"${log_redirects}"
-  sudo rpm-ostree install -y unzip &>"${log_redirects}"
-  sudo rpm-ostree install -y wget &>"${log_redirects}"
-
-  sudo rpm-ostree apply-live &>"${log_redirects}"
 elif command -v dnf &>/dev/null; then
   sudo dnf makecache -y &>"${log_redirects}"
 
@@ -169,12 +158,6 @@ if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redi
     sudo apt install -y systemd-resolved &>"${log_redirects}"
 
     sudo apt purge -y dnscrypt-proxy &>"${log_redirects}"
-  elif command -v rpm-ostree &>/dev/null; then
-    sudo rpm-ostree install -y systemd-resolved &>"${log_redirects}"
-
-    sudo rpm-ostree uninstall -y dnscrypt-proxy &>"${log_redirects}"
-
-    sudo rpm-ostree apply-live &>"${log_redirects}"
   elif command -v dnf &>/dev/null; then
     sudo dnf install -y systemd-resolved &>"${log_redirects}"
 
@@ -233,11 +216,6 @@ else
   if command -v apt &>/dev/null; then
     sudo apt install -y systemd-resolved &>"${log_redirects}"
     sudo apt install -y dnscrypt-proxy &>"${log_redirects}"
-  elif command -v rpm-ostree &>/dev/null; then
-    sudo rpm-ostree install -y systemd-resolved &>"${log_redirects}"
-    sudo rpm-ostree install -y dnscrypt-proxy &>"${log_redirects}"
-
-    sudo rpm-ostree apply-live &>"${log_redirects}"
   elif command -v dnf &>/dev/null; then
     sudo dnf install -y systemd-resolved &>"${log_redirects}"
     sudo dnf install -y dnscrypt-proxy &>"${log_redirects}"
@@ -348,10 +326,6 @@ if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]];
   if command -v apt &>/dev/null; then
     echo -e "         ${red}Use: ${white}sudo apt update -y${reset}"
     echo -e "              ${white}sudo apt upgrade -y${reset}"
-  elif command -v rpm-ostree &>/dev/null; then
-    echo -e "         ${red}Use: ${white}sudo rpm-ostree update${reset}"
-    echo -e "              ${white}sudo rpm-ostree upgrade${reset}"
-    echo -e "              ${white}sudo rpm-ostree apply-live${reset}"
   elif command -v dnf &>/dev/null; then
     echo -e "         ${red}Use: ${white}sudo dnf makecache -y${reset}"
     echo -e "              ${white}sudo dnf upgrade -y${reset}"
@@ -367,7 +341,10 @@ if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]];
   exit 1
 fi
 
-if [[ "${blockcheck_results}" == *"curl_test_https_tls12 ipv4 ${blockcheck_domain} : working without bypass"* ]]; then
+if echo "${blockcheck_results}" \
+   | grep "curl_test_https_tls12 ipv4 ${blockcheck_domain}" \
+   | tail -n 1 \
+   | grep -q "working without bypass"; then
   printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
   sudo rm -rf /opt/zapret
   sudo rm -rf /tmp/zapret
