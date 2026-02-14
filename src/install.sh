@@ -61,6 +61,7 @@ send_metrics() {
         --arg unix_name "${unix_name}" \
         --arg dns_resolver "${dns_resolver}" \
         --arg blockcheck_domain "${blockcheck_domain}" \
+        --arg blockcheck_results "${blockcheck_results}" \
         --arg domain_response "${domain_response}" \
         --arg nfqws_options "${nfqws_options}" \
         '{
@@ -69,6 +70,7 @@ send_metrics() {
             unix_name: $unix_name,
             dns_resolver: $dns_resolver,
             blockcheck_domain: $blockcheck_domain,
+            blockcheck_results: $blockcheck_results,
             domain_response: $domain_response,
             nfqws_options: $nfqws_options
           }
