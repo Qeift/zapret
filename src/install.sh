@@ -62,8 +62,8 @@ send_metrics() {
   )
 
   echo ""
-  echo -e "  ${gray}Would you like to share the results of this tool with ${blue}Keift${gray}?${reset}"
-  echo -ne "  ${gray}This will help us improve this tool faster. [${green}Y${gray}/${red}N${gray}] ${reset}"
+  echo -e "  ${gray}Would you like to share the results with ${blue}Keift${gray}?${reset}"
+  echo -ne "  ${gray}This helps us improve this tool. [${green}Y${gray}/${red}N${gray}] ${reset}"
 
   if [ -t 0 ]; then
     read metrics_answer
