@@ -110,7 +110,6 @@ if command -v apt &>/dev/null; then
   sudo apt install -y curl &>"${log_redirects}"
   sudo apt install -y jq &>"${log_redirects}"
   sudo apt install -y nftables &>"${log_redirects}"
-  sudo apt install -y systemd-resolved &>"${log_redirects}"
   sudo apt install -y unzip &>"${log_redirects}"
   sudo apt install -y wget &>"${log_redirects}"
 elif command -v rpm-ostree &>/dev/null; then
@@ -120,7 +119,6 @@ elif command -v rpm-ostree &>/dev/null; then
   sudo rpm-ostree install -y curl &>"${log_redirects}"
   sudo rpm-ostree install -y jq &>"${log_redirects}"
   sudo rpm-ostree install -y nftables &>"${log_redirects}"
-  sudo rpm-ostree install -y systemd-resolved &>"${log_redirects}"
   sudo rpm-ostree install -y unzip &>"${log_redirects}"
   sudo rpm-ostree install -y wget &>"${log_redirects}"
 
@@ -132,7 +130,6 @@ elif command -v dnf &>/dev/null; then
   sudo dnf install -y curl &>"${log_redirects}"
   sudo dnf install -y jq &>"${log_redirects}"
   sudo dnf install -y nftables &>"${log_redirects}"
-  sudo dnf install -y systemd-resolved &>"${log_redirects}"
   sudo dnf install -y unzip &>"${log_redirects}"
   sudo dnf install -y wget &>"${log_redirects}"
 elif command -v pacman &>/dev/null; then
@@ -142,7 +139,6 @@ elif command -v pacman &>/dev/null; then
   sudo pacman -S --noconfirm curl &>"${log_redirects}"
   sudo pacman -S --noconfirm jq &>"${log_redirects}"
   sudo pacman -S --noconfirm nftables &>"${log_redirects}"
-  sudo pacman -S --noconfirm systemd-resolved &>"${log_redirects}"
   sudo pacman -S --noconfirm unzip &>"${log_redirects}"
   sudo pacman -S --noconfirm wget &>"${log_redirects}"
 elif command -v zypper &>/dev/null; then
@@ -152,7 +148,6 @@ elif command -v zypper &>/dev/null; then
   sudo zypper -n install curl &>"${log_redirects}"
   sudo zypper -n install jq &>"${log_redirects}"
   sudo zypper -n install nftables &>"${log_redirects}"
-  sudo zypper -n install systemd-resolved &>"${log_redirects}"
   sudo zypper -n install unzip &>"${log_redirects}"
   sudo zypper -n install wget &>"${log_redirects}"
 else
@@ -171,14 +166,26 @@ if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redi
   || dig -p 853 +tls +tls-hostname=dns.google +tries=1 @8.8.8.8 &>"${log_redirects}" \
   || dig -p 853 +tls +tls-hostname=common.dot.dns.yandex.net +tries=1 @77.88.8.8 &>"${log_redirects}"; then
   if command -v apt &>/dev/null; then
+    sudo apt install -y systemd-resolved &>"${log_redirects}"
+
     sudo apt purge -y dnscrypt-proxy &>"${log_redirects}"
   elif command -v rpm-ostree &>/dev/null; then
+    sudo rpm-ostree install -y systemd-resolved &>"${log_redirects}"
+
     sudo rpm-ostree uninstall -y dnscrypt-proxy &>"${log_redirects}"
+
+    sudo rpm-ostree apply-live &>"${log_redirects}"
   elif command -v dnf &>/dev/null; then
+    sudo dnf install -y systemd-resolved &>"${log_redirects}"
+
     sudo dnf remove -y dnscrypt-proxy &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
+    sudo pacman -S --noconfirm systemd-resolved &>"${log_redirects}"
+
     sudo pacman -Rns --noconfirm dnscrypt-proxy &>"${log_redirects}"
   elif command -v zypper &>/dev/null; then
+    sudo zypper -n install systemd-resolved &>"${log_redirects}"
+
     sudo zypper -n remove -u dnscrypt-proxy &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported package manager.${reset}"
@@ -224,16 +231,21 @@ EOF
   sudo systemctl restart systemd-resolved
 else
   if command -v apt &>/dev/null; then
+    sudo apt install -y systemd-resolved &>"${log_redirects}"
     sudo apt install -y dnscrypt-proxy &>"${log_redirects}"
   elif command -v rpm-ostree &>/dev/null; then
+    sudo rpm-ostree install -y systemd-resolved &>"${log_redirects}"
     sudo rpm-ostree install -y dnscrypt-proxy &>"${log_redirects}"
 
     sudo rpm-ostree apply-live &>"${log_redirects}"
   elif command -v dnf &>/dev/null; then
+    sudo dnf install -y systemd-resolved &>"${log_redirects}"
     sudo dnf install -y dnscrypt-proxy &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
+    sudo pacman -S --noconfirm systemd-resolved &>"${log_redirects}"
     sudo pacman -S --noconfirm dnscrypt-proxy &>"${log_redirects}"
   elif command -v zypper &>/dev/null; then
+    sudo zypper -n install systemd-resolved &>"${log_redirects}"
     sudo zypper -n install dnscrypt-proxy &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported package manager.${reset}"
