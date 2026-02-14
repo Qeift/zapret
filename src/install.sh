@@ -308,6 +308,22 @@ blockcheck_domain="discord.com"
 [ "${country_code}" = "TR" ] && blockcheck_domain="discord.com"
 [ "${country_code}" = "IN" ] && blockcheck_domain="tiktok.com"
 
+while [[ $# -gt 0 ]]; do
+  case "${1}" in
+    --blockcheck-domain=*)
+      blockcheck_domain="${1#*=}"
+      shift
+      ;;
+    --blockcheck-domain)
+      blockcheck_domain="${2}"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
 if [ "${dev}" = true ]; then
   nfqws_options="--dpi-desync=fakeddisorder --dpi-desync-ttl=1 --dpi-desync-autottl=-5 --dpi-desync-split-pos=1"
 else
