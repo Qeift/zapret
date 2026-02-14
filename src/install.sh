@@ -309,13 +309,13 @@ blockcheck_domain="discord.com"
 [ "${country_code}" = "IN" ] && blockcheck_domain="tiktok.com"
 
 if [ "${dev}" = true ]; then
-  nfqws_options="--dpi-desync=fakeddisorder --dpi-desync-ttl=1 --dpi-desync-autottl=-5 --dpi-desync-split-pos=1"
+  nfqws_options="--dpi-desync-badseq-increment=0 --dpi-desync-fooling=md5sig --dpi-desync-split-seqovl=1 --dpi-desync=fakeddisorder --dpi-desync-ttl=1 --dpi-desync-autottl=-5 --dpi-desync-split-pos=1"
 else
   blockcheck_results=$(printf "${blockcheck_domain}\n\n\n\n\n\n\n\n" | sudo /tmp/zapret/blockcheck.sh 2>"${log_redirects}")
 
   [ "${debug}" = true ] && echo "${blockcheck_results}"
 
-  nfqws_options=$(echo "${blockcheck_results}" | grep "curl_test_https_tls12 ipv4 ${blockcheck_domain} : nfqws" | tail -n 1 | sed "s/.*nfqws //")
+  nfqws_options=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/,\$p" | grep "curl_test_https_tls12 ipv4 ${blockcheck_domain} : nfqws" | sed "s/.*nfqws //" | tr " " "\n" | tac | awk -F= "NF && !seen[\$1]++" | tac | tail -n 62 | tr "\n" " " | sed "s/[[:space:]]*\$//")
 fi
 
 if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]]; then
