@@ -39,7 +39,7 @@ zapret_version="72.9"
 send_metrics() {
   local event="${1}"
   local unix_name=$(uname -a)
-  local domain_response=$(curl --max-time 10 -s -I "https://${blockcheck_domain}" | grep -E "^HTTP/")
+  local domain_response=$(curl --max-time 10 -sS -I "https://${blockcheck_domain}" | head -n 1)
 
   local payload=$(
     jq -n \
