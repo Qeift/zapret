@@ -334,7 +334,7 @@ else
   nfqws_options=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/,\${p}" | grep -E "curl_test_https_tls12" | grep "ipv4 ${blockcheck_domain} : nfqws" | head -n 1 | sed "s/.*nfqws //" | sed "s|/tmp/zapret|/opt/zapret|g" | sed "s/[[:space:]]*\$//")
 fi
 
-if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]]; then
+if echo "${blockcheck_results}" | grep -q "nftables queue support is not available"; then
   printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
   sudo rm -rf /opt/zapret
   sudo rm -rf /tmp/zapret
@@ -359,8 +359,7 @@ if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]];
   exit 1
 fi
 
-if echo "${blockcheck_results}" | grep -q "curl_test_http ipv4 ${blockcheck_domain} : working without bypass" \
-  && echo "${blockcheck_results}" | grep -q "curl_test_https_tls12 ipv4 ${blockcheck_domain} : working without bypass"; then
+if echo "${blockcheck_results}" | grep -q "curl_test_https_tls12 ipv4 ${blockcheck_domain} : working without bypass"; then
   printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
   sudo rm -rf /opt/zapret
   sudo rm -rf /tmp/zapret
