@@ -331,8 +331,8 @@ else
 
   [ "${debug}" = true ] && echo "${blockcheck_results}"
 
-  # nfqws_options=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/,\$p" | grep -E "curl_test_http|curl_test_https_tls12" | grep "ipv4 ${blockcheck_domain} : nfqws" | sed "s/.*nfqws //" | tr " " "\n" | tac | awk -F= "NF && !seen[\$1]++" | tac | tail -n 62 | tr "\n" " " | sed "s|/tmp/zapret|/opt/zapret|g" | sed "s/[[:space:]]*\$//")
-  nfqws_options=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/,\$p" | grep -E "curl_test_http|curl_test_https_tls12" | grep "ipv4 ${blockcheck_domain} : nfqws" | tail -n 1 | sed "s/.*nfqws //" | sed "s|/tmp/zapret|/opt/zapret|g" | sed "s/[[:space:]]*\$//")
+  # nfqws_options=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/,\${p}" | grep -E "curl_test_http|curl_test_https_tls12" | grep "ipv4 ${blockcheck_domain} : nfqws" | sed "s/.*nfqws //" | tr " " "\n" | tac | awk -F= "NF && !seen[\$1]++" | tac | tail -n 62 | tr "\n" " " | sed "s|/tmp/zapret|/opt/zapret|g" | sed "s/[[:space:]]*\$//")
+  nfqws_options=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/,\${p}" | grep -E "curl_test_http|curl_test_https_tls12" | grep "ipv4 ${blockcheck_domain} : nfqws" | tail -n 1 | sed "s/.*nfqws //" | sed "s|/tmp/zapret|/opt/zapret|g" | sed "s/[[:space:]]*\$//")
 fi
 
 if [[ "${blockcheck_results}" == *"nftables queue support is not available"* ]]; then
