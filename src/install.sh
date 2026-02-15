@@ -84,6 +84,11 @@ send_metrics() {
     echo ""
     echo -e "  ${gray}That's okay, nothing was shared.${reset}"
   fi
+
+  echo -e "  ${gray}Need help? Contact us.${reset}"
+  echo ""
+  echo -e "  ${blue}Discord   ${white}https://discord.gg/keift${reset}"
+  echo -e "  ${cyan}Telegram  ${white}https://t.me/keiftco${reset}"
 }
 
 clear
