@@ -325,7 +325,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ "${dev}" = true ]; then
-  nfqws_options="--dpi-desync=fake --dpi-desync-ttl=3"
+  nfqws_options="--dpi-desync=fakeddisorder --dpi-desync-ttl=1 --dpi-desync-autottl=-1 --dpi-desync-split-pos=1"
 else
   blockcheck_results=$(printf "${blockcheck_domain}\n\n\n\n\n\n\n\n" | sudo /tmp/zapret/blockcheck.sh 2>"${log_redirects}")
 
