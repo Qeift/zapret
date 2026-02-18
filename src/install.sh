@@ -419,6 +419,13 @@ EOF
 
 sudo systemctl restart zapret
 
+i=1
+while [ "${i}" -le 10 ]; do
+  curl --max-time 1 -s "https://${blockcheck_domain}" &>"${log_redirects}"
+
+  ((i++))
+done
+
 # 7. Finish the installation
 
 echo -e "  ${gray}Zapret was successfully installed.${reset}"
