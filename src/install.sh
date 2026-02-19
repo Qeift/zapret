@@ -53,6 +53,7 @@ send_metrics() {
 
     local event="${1}"
     local unix_name=$(uname -a)
+    local blockcheck_results=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/,\${p}")
     local domain_response=$(curl --max-time 10 -sS -I "https://${blockcheck_domain}" 2>&1 | head -n 1)
 
     local payload=$(
