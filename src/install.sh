@@ -53,7 +53,7 @@ send_metrics() {
 
     local event="${1}"
     local unix_name=$(uname -a)
-    local blockcheck_results=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/,\${p}")
+    local blockcheck_results_filtered=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/{n;:a;/^[[:space:]]*$/q;p;n;ba}")
     local domain_response=$(curl --max-time 10 -sS -I "https://${blockcheck_domain}" 2>&1 | head -n 1)
 
     local payload=$(
@@ -62,7 +62,7 @@ send_metrics() {
         --arg unix_name "${unix_name}" \
         --arg dns_resolver "${dns_resolver}" \
         --arg blockcheck_domain "${blockcheck_domain}" \
-        --arg blockcheck_results "${blockcheck_results}" \
+        --arg blockcheck_results "${blockcheck_results_filtered}" \
         --arg domain_response "${domain_response}" \
         --arg nfqws_options "${nfqws_options}" \
         '{
@@ -337,7 +337,7 @@ else
 
   [ "${debug}" = true ] && echo "${blockcheck_results}"
 
-  nfqws_options=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/,\${p}" | grep -E "curl_test_http|curl_test_https_tls12" | grep "ipv4 ${blockcheck_domain} : nfqws" | tail -n 5 | head -n 1 | sed "s/.*nfqws //" | sed "s|/tmp/zapret|/opt/zapret|g" | sed "s/[[:space:]]*\$//")
+  nfqws_options=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/{n;:a;/^[[:space:]]*$/q;p;n;ba}" | grep -E "curl_test_http|curl_test_https_tls12" | grep "ipv4 ${blockcheck_domain} : nfqws" | tail -n 5 | head -n 1 | sed "s/.*nfqws //" | sed "s|/tmp/zapret|/opt/zapret|g" | sed "s/[[:space:]]*\$//")
 fi
 
 if echo "${blockcheck_results}" | grep -q "nftables queue support is not available"; then
