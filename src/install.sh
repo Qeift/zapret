@@ -308,10 +308,10 @@ echo -e "  ${gray}Blockcheck is being performed, this may take a few minutes...$
 
 country_code=$(curl --max-time 10 -s https://ipinfo.io/country)
 
-blockcheck_domain="discord.com"
+blockcheck_domain="pornhub.com"
 
-[ "${country_code}" = "RU" ] && blockcheck_domain="discord.com"
-[ "${country_code}" = "TR" ] && blockcheck_domain="discord.com"
+[ "${country_code}" = "RU" ] && blockcheck_domain="youtube.com"
+[ "${country_code}" = "TR" ] && blockcheck_domain="pornhub.com"
 [ "${country_code}" = "IN" ] && blockcheck_domain="tiktok.com"
 
 while [[ $# -gt 0 ]]; do
