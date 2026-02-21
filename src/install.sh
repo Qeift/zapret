@@ -297,7 +297,7 @@ echo -e "  ${gray}Blockcheck is being performed, this may take a few minutes...$
 
 blockcheck_domain="pornhub.com"
 
-[ "${country_code}" = "RU" ] && blockcheck_domain="rr1---sn-nv47lns6.googlevideo.com"
+[ "${country_code}" = "RU" ] && blockcheck_domain="youtube.com"
 [ "${country_code}" = "TR" ] && blockcheck_domain="pornhub.com"
 [ "${country_code}" = "IN" ] && blockcheck_domain="tiktok.com"
 
