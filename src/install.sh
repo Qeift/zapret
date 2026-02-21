@@ -158,14 +158,11 @@ fi
 
 echo -e "  ${gray}DNS settings are being changed...${reset}"
 
-country_code=$(curl --max-time 10 -s https://ipinfo.io/country)
-
-if command -v systemctl &>/dev/null && { \
-  dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
+if command -v systemctl &>/dev/null \
+  && {dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
   || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
   || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"${log_redirects}" \
-  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1001 &>"${log_redirects}"; \
-}; then
+  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1001 &>"${log_redirects}"}; then
   if command -v apt &>/dev/null; then
     sudo apt install -y systemd-resolved &>"${log_redirects}"
 
@@ -294,6 +291,8 @@ sudo /tmp/zapret/install_bin.sh &>"${log_redirects}"
 # 5. Do Blockcheck
 
 echo -e "  ${gray}Blockcheck is being performed, this may take a few minutes...${reset}"
+
+country_code=$(curl --max-time 10 -s https://ipinfo.io/country)
 
 blockcheck_domain="pornhub.com"
 
