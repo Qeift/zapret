@@ -162,9 +162,9 @@ country_code=$(curl --max-time 10 -s https://ipinfo.io/country)
 
 if [ "${country_code}" != "RU" ] && { \
   dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
-  || dig -p 853 +tls +tls-hostname=base.dns.mullvad.net +tries=1 @194.242.2.4 &>"${log_redirects}" \
-  || dig -p 853 +tls +tls-hostname=dns.google +tries=1 @8.8.8.8 &>"${log_redirects}" \
-  || dig -p 853 +tls +tls-hostname=common.dot.dns.yandex.net +tries=1 @77.88.8.8 &>"${log_redirects}"; \
+  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
+  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"${log_redirects}" \
+  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1001 &>"${log_redirects}"; \
 }; then
   if command -v apt &>/dev/null; then
     sudo apt install -y systemd-resolved &>"${log_redirects}"
@@ -200,21 +200,6 @@ DNS=1.1.1.1#one.one.one.one
 DNS=2606:4700:4700::1111#one.one.one.one
 DNS=1.0.0.1#one.one.one.one
 DNS=2606:4700:4700::1001#one.one.one.one
-
-DNS=194.242.2.4#base.dns.mullvad.net
-DNS=2a07:e340::4#base.dns.mullvad.net
-DNS=194.242.2.2#dns.mullvad.net
-DNS=2a07:e340::2#dns.mullvad.net
-
-DNS=8.8.8.8#dns.google
-DNS=2001:4860:4860::8888#dns.google
-DNS=8.8.4.4#dns.google
-DNS=2001:4860:4860::8844#dns.google
-
-DNS=77.88.8.8#common.dot.dns.yandex.net
-DNS=2a02:6b8::feed:0ff#common.dot.dns.yandex.net
-DNS=77.88.8.1#common.dot.dns.yandex.net
-DNS=2a02:6b8:0:1::feed:0ff#common.dot.dns.yandex.net
 
 DNSOverTLS=yes
 EOF
@@ -269,7 +254,7 @@ EOF
   sudo tee /etc/dnscrypt-proxy/dnscrypt-proxy.toml &>/dev/null << EOF
 listen_addresses = ["127.0.0.1:5300", "[::1]:5300"]
 
-server_names = ["cloudflare", "cloudflare-ipv6", "mullvad-base-doh", "mullvad-doh", "google", "google-ipv6", "yandex", "yandex-ipv6"]
+server_names = ["cloudflare", "cloudflare-ipv6"]
 
 [sources]
   [sources."public-resolvers"]
@@ -312,7 +297,7 @@ echo -e "  ${gray}Blockcheck is being performed, this may take a few minutes...$
 
 blockcheck_domain="pornhub.com"
 
-[ "${country_code}" = "RU" ] && blockcheck_domain="youtube.com"
+[ "${country_code}" = "RU" ] && blockcheck_domain="rr1---sn-nv47lns6.googlevideo.com"
 [ "${country_code}" = "TR" ] && blockcheck_domain="pornhub.com"
 [ "${country_code}" = "IN" ] && blockcheck_domain="tiktok.com"
 
