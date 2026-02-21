@@ -160,7 +160,7 @@ echo -e "  ${gray}DNS settings are being changed...${reset}"
 
 country_code=$(curl --max-time 10 -s https://ipinfo.io/country)
 
-if [ "$country_code" != "RU" ] && { \
+if [ "${country_code}" != "RU" ] && { \
   dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
   || dig -p 853 +tls +tls-hostname=base.dns.mullvad.net +tries=1 @194.242.2.4 &>"${log_redirects}" \
   || dig -p 853 +tls +tls-hostname=dns.google +tries=1 @8.8.8.8 &>"${log_redirects}" \
@@ -312,7 +312,7 @@ echo -e "  ${gray}Blockcheck is being performed, this may take a few minutes...$
 
 blockcheck_domain="pornhub.com"
 
-[ "${country_code}" = "RU" ] && blockcheck_domain="youtube.com"
+[ "${country_code}" = "RU" ] && blockcheck_domain="rr1---sn-nv47lns6.googlevideo.com"
 [ "${country_code}" = "TR" ] && blockcheck_domain="pornhub.com"
 [ "${country_code}" = "IN" ] && blockcheck_domain="tiktok.com"
 
