@@ -34,7 +34,7 @@ cyan="\e[36m"
 white="\e[37m"
 gray="\e[90m"
 
-zapret_version="72.9"
+zapret_version="72.10"
 
 send_metrics() {
   echo ""
