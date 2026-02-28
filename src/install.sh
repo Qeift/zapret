@@ -527,14 +527,15 @@ EOF
     echo ""
     echo -e "    ${gray}It appears you are using ${red}Pi-hole${gray}.${reset}"
     echo -e "    ${gray}Change the ${green}Custom DNS ${gray}option in the Pi-hole to: ${white}127.0.0.1#5300${reset}"
-    echo -e "    ${gray}Press ${blue}[ENTER] ${gray}after you have made this change to continue...${reset}"
-    echo ""
+    echo -ne "    ${gray}Press ${blue}[ENTER] ${gray}after you have made this change to continue...${reset}"
 
     if [ -t 0 ]; then
       read -r
     else
       read -r < /dev/tty
     fi
+
+    echo ""
   else
     sudo tee /etc/dnscrypt-proxy/dnscrypt-proxy.toml &>/dev/null << EOF
 listen_addresses = ["127.0.0.1:53", "[::1]:53"]
