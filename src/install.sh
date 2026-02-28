@@ -293,11 +293,28 @@ echo -e "  ${gray}Blockcheck is being performed, this may take a few minutes...$
 
 country_code=$(curl --max-time 10 -s https://ipinfo.io/country)
 
-blockcheck_domain="pornhub.com"
+blockcheck_domains=(
+  "discord.com"
+  "facebook.com"
+  "google.com"
+  "instagram.com"
+  "pornhub.com"
+  "roblox.com"
+  "tiktok.com"
+  "x.com"
+  "yandex.com"
+  "youtube.com"
+)
 
-[ "${country_code}" = "RU" ] && blockcheck_domain="youtube.com"
-[ "${country_code}" = "TR" ] && blockcheck_domain="pornhub.com"
-[ "${country_code}" = "IN" ] && blockcheck_domain="tiktok.com"
+blockcheck_domain="google.com"
+
+for domain in "${blockcheck_domains[@]}"; do
+  if ! curl --max-time 10 "https://${domain}" &>/dev/null; then
+    blockcheck_domain="${domain}"
+
+    break
+  fi
+done
 
 while [[ $# -gt 0 ]]; do
   case "${1}" in
