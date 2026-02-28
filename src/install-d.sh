@@ -105,6 +105,8 @@ start_service() {
     sudo rcctl start "${service_name}" &>"${log_redirects}"
   elif command -v service &>/dev/null; then
     sudo service "${service_name}" start &>"${log_redirects}"
+  elif [ -x "/etc/init.d/${service_name}" ]; then
+    sudo "/etc/init.d/${service_name}" start &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported init service.${reset}"
     echo ""
@@ -113,19 +115,21 @@ start_service() {
   fi
 }
 
-start_service() {
+stop_service() {
   local service_name="${1}"
 
   if command -v systemctl &>/dev/null; then
-    sudo systemctl start "${service_name}" &>"${log_redirects}"
+    sudo systemctl stop "${service_name}" &>"${log_redirects}"
   elif command -v sv &>/dev/null; then
-    sudo sv start "${service_name}" &>"${log_redirects}"
+    sudo sv stop "${service_name}" &>"${log_redirects}"
   elif command -v rc-service &>/dev/null; then
-    sudo rc-service "${service_name}" start &>"${log_redirects}"
+    sudo rc-service "${service_name}" stop &>"${log_redirects}"
   elif command -v rcctl &>/dev/null; then
-    sudo rcctl start "${service_name}" &>"${log_redirects}"
+    sudo rcctl stop "${service_name}" &>"${log_redirects}"
   elif command -v service &>/dev/null; then
-    sudo service "${service_name}" start &>"${log_redirects}"
+    sudo service "${service_name}" stop &>"${log_redirects}"
+  elif [ -x "/etc/init.d/${service_name}" ]; then
+    sudo "/etc/init.d/${service_name}" stop &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported init service.${reset}"
     echo ""
@@ -147,6 +151,8 @@ restart_service() {
     sudo rcctl restart "${service_name}" &>"${log_redirects}"
   elif command -v service &>/dev/null; then
     sudo service "${service_name}" restart &>"${log_redirects}"
+  elif [ -x "/etc/init.d/${service_name}" ]; then
+    sudo "/etc/init.d/${service_name}" restart &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported init service.${reset}"
     echo ""
@@ -178,6 +184,8 @@ enable_service() {
       echo ""
       exit 1
     fi
+  elif [ -x "/etc/init.d/${service_name}" ]; then
+    sudo "/etc/init.d/${service_name}" enable &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported init service.${reset}"
     echo ""
@@ -260,6 +268,8 @@ install_package() {
     sudo pkg install -y "${package_name}" &>"${log_redirects}"
   elif command -v pkg_add &>/dev/null; then
     sudo pkg_add -I "${package_name}" &>"${log_redirects}"
+  elif command -v opkg &>/dev/null; then
+    sudo opkg install "${package_name}" &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported package manager.${reset}"
     echo ""
@@ -289,6 +299,8 @@ remove_package() {
     sudo pkg delete -y "${package_name}" &>"${log_redirects}"
   elif command -v pkg_delete &>/dev/null; then
     sudo pkg_delete "${package_name}" &>"${log_redirects}"
+  elif command -v opkg &>/dev/null; then
+    sudo opkg remove "${package_name}" &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported package manager.${reset}"
     echo ""
@@ -318,6 +330,8 @@ update_packages() {
     sudo pkg update &>"${log_redirects}"
   elif command -v pkg_add &>/dev/null; then
     sudo pkg_add -u &>"${log_redirects}"
+  elif command -v opkg &>/dev/null; then
+    sudo opkg update &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported package manager.${reset}"
     echo ""
