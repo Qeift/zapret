@@ -216,24 +216,24 @@ init_zapret() {
   if command -v sv &>/dev/null; then
     sudo mkdir -p /etc/sv/zapret
 
-    sudo tee /etc/sv/zapret/run &>/dev/null << 'EOF'
+    sudo tee /etc/sv/zapret/run &>/dev/null << EOF
 #!/bin/sh
 
 /opt/zapret/init.d/sysv/zapret start
 exec chpst -b zapret pause
 EOF
 
-    sudo tee /etc/sv/zapret/finish &>/dev/null << 'EOF'
+    sudo tee /etc/sv/zapret/finish &>/dev/null << EOF
 #!/bin/sh
 
 /opt/zapret/init.d/sysv/zapret stop
 EOF
 
-  sudo chmod +x /etc/sv/zapret/run /etc/sv/zapret/finish
+    sudo chmod +x /etc/sv/zapret/run /etc/sv/zapret/finish
 
-  sudo ln -sf /etc/sv/zapret /var/service
+    sudo ln -sf /etc/sv/zapret /var/service
   elif command -v rcctl &>/dev/null; then
-    sudo tee /etc/rc.d/zapret &>/dev/null << 'EOF'
+    sudo tee /etc/rc.d/zapret &>/dev/null << EOF
 #!/bin/ksh
 
 daemon="/opt/zapret/init.d/sysv/zapret"
