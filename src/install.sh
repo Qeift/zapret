@@ -63,7 +63,7 @@ send_metrics() {
     elif command -v rc-service &>/dev/null; then
       init_system="OpenRC"
     elif command -v rcctl &>/dev/null; then
-      init_system="OpenBSD Init"
+      init_system="OpenBSD"
     elif command -v service &>/dev/null; then
       init_system="SysvInıt"
     else
@@ -124,7 +124,7 @@ start_service() {
   elif [ -x "/etc/init.d/${service_name}" ]; then
     sudo "/etc/init.d/${service_name}" start &>"${log_redirects}"
   else
-    echo -e "  ${red}Error: Unsupported service manager.${reset}"
+    echo -e "  ${red}Error: Unsupported init system.${reset}"
     echo ""
 
     exit 1
@@ -147,7 +147,7 @@ stop_service() {
   elif [ -x "/etc/init.d/${service_name}" ]; then
     sudo "/etc/init.d/${service_name}" stop &>"${log_redirects}"
   else
-    echo -e "  ${red}Error: Unsupported service manager.${reset}"
+    echo -e "  ${red}Error: Unsupported init system.${reset}"
     echo ""
 
     exit 1
@@ -170,7 +170,7 @@ restart_service() {
   elif [ -x "/etc/init.d/${service_name}" ]; then
     sudo "/etc/init.d/${service_name}" restart &>"${log_redirects}"
   else
-    echo -e "  ${red}Error: Unsupported service manager.${reset}"
+    echo -e "  ${red}Error: Unsupported init system.${reset}"
     echo ""
 
     exit 1
@@ -203,7 +203,7 @@ enable_service() {
   elif [ -x "/etc/init.d/${service_name}" ]; then
     sudo "/etc/init.d/${service_name}" enable &>"${log_redirects}"
   else
-    echo -e "  ${red}Error: Unsupported service manager.${reset}"
+    echo -e "  ${red}Error: Unsupported init system.${reset}"
     echo ""
 
     exit 1
