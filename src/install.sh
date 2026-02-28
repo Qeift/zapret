@@ -233,7 +233,7 @@ EOF
 
     sudo ln -sf /etc/sv/zapret /var/service
   elif command -v rcctl &>/dev/null; then
-    sudo tee /etc/rc.d/zapret &>/dev/null << EOF
+    sudo tee /etc/rc.d/zapret &>/dev/null << 'EOF'
 #!/bin/ksh
 
 daemon="/opt/zapret/init.d/sysv/zapret"
