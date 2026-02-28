@@ -386,7 +386,9 @@ install_package wget
 
 echo -e "  ${gray}DNS settings are being changed...${reset}"
 
-if command -v systemctl &>/dev/null; then
+if command -v pihole &>/dev/null || command -v pihole-FTL &>/dev/null; then
+  dns_resolver="pihole"
+elif command -v systemctl &>/dev/null; then
   if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"${log_redirects}" \
@@ -442,6 +444,14 @@ EOF
 
     enable_service dnscrypt-proxy
     start_service dnscrypt-proxy
+
+    sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
+
+    sudo tee /etc/systemd/resolved.conf &>/dev/null <<< ""
+
+    [ -e /run/systemd/resolve/stub-resolv.conf ] && sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
+    restart_service systemd-resolved
 
     sudo tee /etc/dnscrypt-proxy/dnscrypt-proxy.toml &>/dev/null << EOF
 listen_addresses = ["127.0.0.1:5300", "[::1]:5300"]
@@ -508,15 +518,19 @@ EOF
 
   sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
 
+  if [ "${strict}" = true ]; then
+  sudo tee /etc/resolv.conf &>/dev/null << EOF
+nameserver 127.0.0.1
+nameserver ::1
+EOF
+  else
   sudo tee /etc/resolv.conf &>/dev/null << EOF
 nameserver 127.0.0.1
 nameserver ::1
 
-nameserver 1.1.1.1
-nameserver 2606:4700:4700::1111
-nameserver 1.0.0.1
-nameserver 2606:4700:4700::1001
+nameserver 192.168.1.1
 EOF
+  fi
 fi
 
 # 3. Download Zapret
