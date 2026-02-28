@@ -572,7 +572,7 @@ if command -v systemctl \
   || command -v rc-service; then
   printf "Y\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
 else
-  printf "Y\nY\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
+  printf "Y\nY\nY\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
 fi
 
 sudo sed -i "/^NFQWS_OPT=\"/,/^\"/c NFQWS_OPT=\"${nfqws_options} --hostlist=/opt/zapret/hostlist.txt --hostlist-auto=/opt/zapret/ipset/zapret-hostlist-auto.txt\"" /opt/zapret/config
@@ -606,6 +606,8 @@ roblox.com
 
 # Others
 EOF
+
+init_zapret
 
 restart_service zapret
 
