@@ -108,7 +108,7 @@ start_service() {
   elif [ -x "/etc/init.d/${service_name}" ]; then
     sudo "/etc/init.d/${service_name}" start &>"${log_redirects}"
   else
-    echo -e "  ${red}Error: Unsupported init service.${reset}"
+    echo -e "  ${red}Error: Unsupported service manager.${reset}"
     echo ""
 
     exit 1
@@ -131,7 +131,7 @@ stop_service() {
   elif [ -x "/etc/init.d/${service_name}" ]; then
     sudo "/etc/init.d/${service_name}" stop &>"${log_redirects}"
   else
-    echo -e "  ${red}Error: Unsupported init service.${reset}"
+    echo -e "  ${red}Error: Unsupported service manager.${reset}"
     echo ""
 
     exit 1
@@ -154,7 +154,7 @@ restart_service() {
   elif [ -x "/etc/init.d/${service_name}" ]; then
     sudo "/etc/init.d/${service_name}" restart &>"${log_redirects}"
   else
-    echo -e "  ${red}Error: Unsupported init service.${reset}"
+    echo -e "  ${red}Error: Unsupported service manager.${reset}"
     echo ""
 
     exit 1
@@ -187,7 +187,7 @@ enable_service() {
   elif [ -x "/etc/init.d/${service_name}" ]; then
     sudo "/etc/init.d/${service_name}" enable &>"${log_redirects}"
   else
-    echo -e "  ${red}Error: Unsupported init service.${reset}"
+    echo -e "  ${red}Error: Unsupported service manager.${reset}"
     echo ""
 
     exit 1
