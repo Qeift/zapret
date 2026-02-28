@@ -2,10 +2,12 @@
 
 sudo -v
 
+strict=false
 dev=false
 debug=false
 
 for arg in "${@}"; do
+  [ "${arg}" = "--strict" ] && strict=true
   [ "${arg}" = "--dev" ] && dev=true
   [ "${arg}" = "--debug" ] && debug=true
 done
@@ -228,6 +230,7 @@ EOF
 EOF
 
   sudo chmod +x /etc/sv/zapret/run /etc/sv/zapret/finish
+
   sudo ln -sf /etc/sv/zapret /var/service
   elif command -v rcctl &>/dev/null; then
     sudo tee /etc/rc.d/zapret &>/dev/null << 'EOF'
@@ -249,6 +252,7 @@ rc_cmd "${1}"
 EOF
 
     sudo chmod +x /etc/rc.d/zapret
+
     sudo rcctl enable zapret &>"${log_redirects}"
   elif command -v sysrc &>/dev/null; then
     sudo ln -sf /opt/zapret/init.d/sysv/zapret /usr/local/etc/rc.d/zapret
@@ -382,9 +386,7 @@ install_package wget
 
 echo -e "  ${gray}DNS settings are being changed...${reset}"
 
-if command -v pihole &>/dev/null || command -v pihole-FTL &>/dev/null; then
-  dns_resolver="pihole"
-elif command -v systemctl &>/dev/null; then
+if command -v systemctl &>/dev/null; then
   if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"${log_redirects}" \
@@ -399,7 +401,19 @@ elif command -v systemctl &>/dev/null; then
     enable_service systemd-resolved
     start_service systemd-resolved
 
-    sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
+    if [ "${strict}" = true ]; then
+      sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
+[Resolve]
+DNS=1.1.1.1#one.one.one.one
+DNS=2606:4700:4700::1111#one.one.one.one
+DNS=1.0.0.1#one.one.one.one
+DNS=2606:4700:4700::1001#one.one.one.one
+
+Domains=~.
+DNSOverTLS=yes
+EOF
+    else
+      sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
 [Resolve]
 DNS=1.1.1.1#one.one.one.one
 DNS=2606:4700:4700::1111#one.one.one.one
@@ -408,6 +422,7 @@ DNS=2606:4700:4700::1001#one.one.one.one
 
 DNSOverTLS=yes
 EOF
+    fi
 
     sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
 
@@ -428,20 +443,6 @@ EOF
     enable_service dnscrypt-proxy
     start_service dnscrypt-proxy
 
-    sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
-[Resolve]
-DNS=127.0.0.1:5300
-DNS=[::1]:5300
-
-DNSOverTLS=no
-EOF
-
-    sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
-
-    [ -e /run/systemd/resolve/stub-resolv.conf ] && sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-
-    restart_service systemd-resolved
-
     sudo tee /etc/dnscrypt-proxy/dnscrypt-proxy.toml &>/dev/null << EOF
 listen_addresses = ["127.0.0.1:5300", "[::1]:5300"]
 
@@ -455,6 +456,31 @@ server_names = ["cloudflare", "cloudflare-ipv6"]
 EOF
 
     restart_service dnscrypt-proxy
+
+    if [ "${strict}" = true ]; then
+      sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
+[Resolve]
+DNS=127.0.0.1:5300
+DNS=[::1]:5300
+
+Domains=~.
+DNSOverTLS=no
+EOF
+    else
+      sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
+[Resolve]
+DNS=127.0.0.1:5300
+DNS=[::1]:5300
+
+DNSOverTLS=no
+EOF
+    fi
+
+    sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
+
+    [ -e /run/systemd/resolve/stub-resolv.conf ] && sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
+    restart_service systemd-resolved
   fi
 else
   dns_resolver="dnscrypt-proxy"
@@ -465,18 +491,6 @@ else
 
   enable_service dnscrypt-proxy
   start_service dnscrypt-proxy
-
-  sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
-
-  sudo tee /etc/resolv.conf &>/dev/null << EOF
-nameserver 127.0.0.1
-nameserver ::1
-
-nameserver 1.1.1.1
-nameserver 2606:4700:4700::1111
-nameserver 1.0.0.1
-nameserver 2606:4700:4700::1001
-EOF
 
   sudo tee /etc/dnscrypt-proxy/dnscrypt-proxy.toml &>/dev/null << EOF
 listen_addresses = ["127.0.0.1:53", "[::1]:53"]
@@ -491,6 +505,18 @@ server_names = ["cloudflare", "cloudflare-ipv6"]
 EOF
 
   restart_service dnscrypt-proxy
+
+  sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
+
+  sudo tee /etc/resolv.conf &>/dev/null << EOF
+nameserver 127.0.0.1
+nameserver ::1
+
+nameserver 1.1.1.1
+nameserver 2606:4700:4700::1111
+nameserver 1.0.0.1
+nameserver 2606:4700:4700::1001
+EOF
 fi
 
 # 3. Download Zapret
