@@ -347,16 +347,6 @@ echo ""
 echo -e "  ${blue}Keift ${cyan}Install Zapret${reset}"
 echo ""
 
-if ! command -v systemctl &>/dev/null \
-  && ! command -v sv &>/dev/null \
-  && ! command -v rc-service &>/dev/null \
-  && ! command -v service &>/dev/null; then
-  echo -e "  ${red}Error: Unsupported init service.${reset}"
-  echo ""
-
-  exit 1
-fi
-
 # 1. Install dependencies
 
 echo -e "  ${gray}Installing dependencies...${reset}"
@@ -582,8 +572,8 @@ fi
 
 echo -e "  ${gray}Installing Zapret...${reset}"
 
-if command -v systemctl \
-  || command -v rc-service; then
+if command -v systemctl &>/dev/null \
+  || command -v rc-service &>/dev/null; then
   printf "Y\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
 else
   printf "Y\nY\nY\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
