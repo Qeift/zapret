@@ -56,10 +56,25 @@ send_metrics() {
     local blockcheck_results_filtered=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/{n;:a;/^[[:space:]]*$/q;p;n;ba}")
     local domain_response=$(curl --max-time 10 -sS -I "https://${blockcheck_domain}" 2>&1 | head -n 1)
 
+    if command -v systemctl &>/dev/null; then
+      init_system="Systemd"
+    elif command -v sv &>/dev/null; then
+      init_system="Runit"
+    elif command -v rc-service &>/dev/null; then
+      init_system="OpenRC"
+    elif command -v rcctl &>/dev/null; then
+      init_system="OpenBSD Init"
+    elif command -v service &>/dev/null; then
+      init_system="SysvInıt"
+    else
+      init_system="Unknown"
+    fi
+
     local payload=$(
       jq -n \
         --arg event "${event}" \
         --arg unix_name "${unix_name}" \
+        --arg init_system "${init_system}" \
         --arg dns_resolver "${dns_resolver}" \
         --arg blockcheck_domain "${blockcheck_domain}" \
         --arg blockcheck_results "${blockcheck_results_filtered}" \
@@ -69,6 +84,7 @@ send_metrics() {
           event: $event,
           data: {
             unix_name: $unix_name,
+            init_system: $init_system,
             dns_resolver: $dns_resolver,
             blockcheck_domain: $blockcheck_domain,
             blockcheck_results: $blockcheck_results,
