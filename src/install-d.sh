@@ -101,6 +101,8 @@ start_service() {
     sudo sv start "${service_name}" &>"${log_redirects}"
   elif command -v rc-service &>/dev/null; then
     sudo rc-service "${service_name}" start &>"${log_redirects}"
+  elif command -v rcctl &>/dev/null; then
+    sudo rcctl start "${service_name}" &>"${log_redirects}"
   elif command -v service &>/dev/null; then
     sudo service "${service_name}" start &>"${log_redirects}"
   else
@@ -120,6 +122,8 @@ restart_service() {
     sudo sv restart "${service_name}" &>"${log_redirects}"
   elif command -v rc-service &>/dev/null; then
     sudo rc-service "${service_name}" restart &>"${log_redirects}"
+  elif command -v rcctl &>/dev/null; then
+    sudo rcctl restart "${service_name}" &>"${log_redirects}"
   elif command -v service &>/dev/null; then
     sudo service "${service_name}" restart &>"${log_redirects}"
   else
@@ -139,6 +143,10 @@ enable_service() {
     sudo ln -sf "/etc/sv/${service_name}" /var/service/ &>"${log_redirects}"
   elif command -v rc-service &>/dev/null; then
     sudo rc-update add "${service_name}" default &>"${log_redirects}"
+  elif command -v rcctl &>/dev/null; then
+    sudo rcctl enable "${service_name}" &>"${log_redirects}"
+  elif command -v sysrc &>/dev/null; then
+    sudo sysrc "${service_name}_enable=YES" &>"${log_redirects}"
   elif command -v service &>/dev/null; then
     if command -v update-rc.d &>/dev/null; then
       sudo update-rc.d "${service_name}" defaults &>"${log_redirects}"
@@ -170,6 +178,14 @@ install_package() {
     sudo xbps-install -y "${package_name}" &>"${log_redirects}"
   elif command -v zypper &>/dev/null; then
     sudo zypper -n install "${package_name}" &>"${log_redirects}"
+  elif command -v apk &>/dev/null; then
+    sudo apk add --quiet "${package_name}" &>"${log_redirects}"
+  elif command -v emerge &>/dev/null; then
+    sudo emerge --quiet "${package_name}" &>"${log_redirects}"
+  elif command -v pkg &>/dev/null; then
+    sudo pkg install -y "${package_name}" &>"${log_redirects}"
+  elif command -v pkg_add &>/dev/null; then
+    sudo pkg_add -I "${package_name}" &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported package manager.${reset}"
     echo ""
@@ -191,6 +207,14 @@ remove_package() {
     sudo xbps-remove -y "${package_name}" &>"${log_redirects}"
   elif command -v zypper &>/dev/null; then
     sudo zypper -n remove "${package_name}" &>"${log_redirects}"
+  elif command -v apk &>/dev/null; then
+    sudo apk del --quiet "${package_name}" &>"${log_redirects}"
+  elif command -v emerge &>/dev/null; then
+    sudo emerge --unmerge --quiet "${package_name}" &>"${log_redirects}"
+  elif command -v pkg &>/dev/null; then
+    sudo pkg delete -y "${package_name}" &>"${log_redirects}"
+  elif command -v pkg_delete &>/dev/null; then
+    sudo pkg_delete "${package_name}" &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported package manager.${reset}"
     echo ""
@@ -207,11 +231,19 @@ update_packages() {
   elif command -v dnf &>/dev/null; then
     sudo dnf makecache -y &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
-    sudo pacman -Syu &>"${log_redirects}"
-  elif command -v xbps-remove &>/dev/null; then
+    sudo pacman -Syu --noconfirm &>"${log_redirects}"
+  elif command -v xbps-install &>/dev/null; then
     sudo xbps-install -Suy &>"${log_redirects}"
   elif command -v zypper &>/dev/null; then
     sudo zypper -n refresh &>"${log_redirects}"
+  elif command -v apk &>/dev/null; then
+    sudo apk update --quiet &>"${log_redirects}"
+  elif command -v emerge &>/dev/null; then
+    sudo emerge --sync --quiet &>"${log_redirects}"
+  elif command -v pkg &>/dev/null; then
+    sudo pkg update &>"${log_redirects}"
+  elif command -v pkg_add &>/dev/null; then
+    sudo pkg_add -u &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported package manager.${reset}"
     echo ""
@@ -260,12 +292,13 @@ if command -v systemctl &>/dev/null; then
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1001 &>"${log_redirects}"; then
+
+    dns_resolver="systemd-resolved"
+
     update_packages
 
     install_package systemd-resolved
     remove_package dnscrypt-proxy
-
-    dns_resolver="systemd-resolved"
 
     enable_service systemd-resolved
     start_service systemd-resolved
@@ -286,12 +319,12 @@ EOF
 
     sudo systemctl restart systemd-resolved
   else
+    dns_resolver="dnscrypt-proxy"
+
     update_packages
 
     install_package systemd-resolved
     install_package dnscrypt-proxy
-
-    dns_resolver="dnscrypt-proxy"
 
     enable_service systemd-resolved
     start_service systemd-resolved
@@ -328,11 +361,11 @@ EOF
     restart_service dnscrypt-proxy
   fi
 else
+  dns_resolver="dnscrypt-proxy"
+
   update_packages
 
   install_package dnscrypt-proxy
-
-  dns_resolver="dnscrypt-proxy"
 
   enable_service dnscrypt-proxy
   start_service dnscrypt-proxy
