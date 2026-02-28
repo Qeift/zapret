@@ -524,9 +524,11 @@ server_names = ["cloudflare", "cloudflare-ipv6"]
   cache_file = "/var/cache/dnscrypt-proxy/public-resolvers-v3.md"
 EOF
 
+    echo ""
     echo -e "    ${gray}It appears you are using ${red}Pi-hole${gray}.${reset}"
     echo -e "    ${gray}Change the ${green}Custom DNS ${gray}option in the Pi-hole to: ${white}127.0.0.1#5300${reset}"
     echo -e "    ${gray}Press ${blue}[ENTER] ${gray}after you have made this change to continue...${reset}"
+    echo ""
 
     if [ -t 0 ]; then
       read -r
