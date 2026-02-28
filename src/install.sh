@@ -386,9 +386,7 @@ install_package wget
 
 echo -e "  ${gray}DNS settings are being changed...${reset}"
 
-if command -v pihole &>/dev/null || command -v pihole-FTL &>/dev/null; then
-  dns_resolver="pihole"
-elif command -v systemctl &>/dev/null; then
+if command -v systemctl &>/dev/null && ! command -v pihole &>/dev/null && ! command -v pihole-FTL &>/dev/null; then
   if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"${log_redirects}" \
@@ -519,18 +517,23 @@ EOF
   sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
 
   if [ "${strict}" = true ]; then
-  sudo tee /etc/resolv.conf &>/dev/null << EOF
+   sudo tee /etc/resolv.conf &>/dev/null << EOF
 nameserver 127.0.0.1
 nameserver ::1
 EOF
   else
-  sudo tee /etc/resolv.conf &>/dev/null << EOF
+    sudo tee /etc/resolv.conf &>/dev/null << EOF
 nameserver 127.0.0.1
 nameserver ::1
 
-nameserver 192.168.1.1
+nameserver 1.1.1.1
+nameserver 2606:4700:4700::1111
+nameserver 1.0.0.1
+nameserver 2606:4700:4700::1001
 EOF
   fi
+
+  sudo chattr +i /etc/resolv.conf &>"${log_redirects}"
 fi
 
 # 3. Download Zapret
