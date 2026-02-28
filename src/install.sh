@@ -65,7 +65,7 @@ send_metrics() {
     elif command -v rcctl &>/dev/null; then
       init_system="OpenBSD"
     elif command -v service &>/dev/null; then
-      init_system="SysvInıt"
+      init_system="SysvInit"
     else
       init_system="Unknown"
     fi
