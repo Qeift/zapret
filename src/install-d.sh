@@ -113,6 +113,27 @@ start_service() {
   fi
 }
 
+start_service() {
+  local service_name="${1}"
+
+  if command -v systemctl &>/dev/null; then
+    sudo systemctl start "${service_name}" &>"${log_redirects}"
+  elif command -v sv &>/dev/null; then
+    sudo sv start "${service_name}" &>"${log_redirects}"
+  elif command -v rc-service &>/dev/null; then
+    sudo rc-service "${service_name}" start &>"${log_redirects}"
+  elif command -v rcctl &>/dev/null; then
+    sudo rcctl start "${service_name}" &>"${log_redirects}"
+  elif command -v service &>/dev/null; then
+    sudo service "${service_name}" start &>"${log_redirects}"
+  else
+    echo -e "  ${red}Error: Unsupported init service.${reset}"
+    echo ""
+
+    exit 1
+  fi
+}
+
 restart_service() {
   local service_name="${1}"
 
@@ -162,6 +183,59 @@ enable_service() {
     echo ""
 
     exit 1
+  fi
+}
+
+init_zapret() {
+  if command -v sv &>/dev/null; then
+    sudo mkdir -p /etc/sv/zapret
+
+    sudo tee /etc/sv/zapret/run &>/dev/null << 'EOF'
+#!/bin/sh
+
+/opt/zapret/init.d/sysv/zapret start
+exec chpst -b zapret pause
+EOF
+
+    sudo tee /etc/sv/zapret/finish &>/dev/null << 'EOF'
+#!/bin/sh
+
+/opt/zapret/init.d/sysv/zapret stop
+EOF
+
+  sudo chmod +x /etc/sv/zapret/run /etc/sv/zapret/finish
+  sudo ln -sf /etc/sv/zapret /var/service
+  elif command -v rcctl &>/dev/null; then
+    sudo tee /etc/rc.d/zapret &>/dev/null << 'EOF'
+#!/bin/ksh
+daemon="/opt/zapret/init.d/sysv/zapret"
+
+. /etc/rc.d/rc.subr
+
+rc_start() {
+  ${daemon} start
+}
+
+rc_stop() {
+  ${daemon} stop
+}
+
+rc_cmd "${1}"
+EOF
+
+    sudo chmod +x /etc/rc.d/zapret
+    sudo rcctl enable zapret &>"${log_redirects}"
+  elif command -v sysrc &>/dev/null; then
+    sudo ln -sf /opt/zapret/init.d/sysv/zapret /usr/local/etc/rc.d/zapret
+    sudo sysrc zapret_enable="YES" &>"${log_redirects}"
+  elif command -v service &>/dev/null; then
+    sudo ln -sf /opt/zapret/init.d/sysv/zapret /etc/init.d/zapret
+
+    if command -v update-rc.d &>/dev/null; then
+      sudo update-rc.d zapret defaults &>"${log_redirects}"
+    elif command -v chkconfig &>/dev/null; then
+      sudo chkconfig zapret on &>"${log_redirects}"
+    fi
   fi
 }
 
@@ -494,7 +568,12 @@ fi
 
 echo -e "  ${gray}Installing Zapret...${reset}"
 
-printf "Y\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
+if command -v systemctl \
+  || command -v rc-service; then
+  printf "Y\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
+else
+  printf "Y\nY\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
+fi
 
 sudo sed -i "/^NFQWS_OPT=\"/,/^\"/c NFQWS_OPT=\"${nfqws_options} --hostlist=/opt/zapret/hostlist.txt --hostlist-auto=/opt/zapret/ipset/zapret-hostlist-auto.txt\"" /opt/zapret/config
 
