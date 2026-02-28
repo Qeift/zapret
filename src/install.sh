@@ -528,22 +528,6 @@ for domain in "${blockcheck_domains[@]}"; do
 done
 
 while [[ $# -gt 0 ]]; do
-  case "${1}" in
-    --blockcheck-domain=*)
-      blockcheck_domain="${1#*=}"
-      shift
-      ;;
-    --blockcheck-domain)
-      blockcheck_domain="${2}"
-      shift 2
-      ;;
-    *)
-      shift
-      ;;
-  esac
-done
-
-while [[ $# -gt 0 ]]; do
   if [[ "${1}" == "--blockcheck-domain="* ]]; then
     blockcheck_domain="${1#*=}"
 
