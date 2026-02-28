@@ -525,9 +525,9 @@ server_names = ["cloudflare", "cloudflare-ipv6"]
 EOF
 
     echo ""
-    echo -e "    ${gray}It appears you are using ${red}Pi-hole${gray}.${reset}"
-    echo -e "    ${gray}Change the ${green}Custom DNS ${gray}option in the Pi-hole to: ${white}127.0.0.1#5300${reset}"
-    echo -ne "    ${gray}Press ${blue}[ENTER] ${gray}after you have made this change to continue...${reset}"
+    echo -e "  ${gray}It appears you are using ${red}Pi-hole${gray}.${reset}"
+    echo -e "  ${gray}Change the ${green}Custom DNS ${gray}option in the Pi-hole to: ${white}127.0.0.1#5300${reset}"
+    echo -ne "  ${gray}Press ${blue}[ENTER] ${gray}after you have made this change to continue...${reset}"
 
     if [ -t 0 ]; then
       read -r
