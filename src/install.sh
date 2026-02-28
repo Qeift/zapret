@@ -291,8 +291,6 @@ sudo /tmp/zapret/install_bin.sh &>"${log_redirects}"
 
 echo -e "  ${gray}Blockcheck is being performed, this may take a few minutes...${reset}"
 
-country_code=$(curl --max-time 10 -s https://ipinfo.io/country)
-
 blockcheck_domains=(
   "discord.com"
   "facebook.com"
