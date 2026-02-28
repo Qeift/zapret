@@ -13,6 +13,7 @@
   - **PKG package manager support.** Respect for PKG package manager.
   - **PKG_ADD package manager support.** Respect for PKG_ADD package manager.
   - **OPKG package manager support.** Respect for OPKG package manager.
+  - **Pi-hole support.** It exhibits different behavior for Pi-hole.
   - **Multiple blockchecks.** It attempts to find the most suitable domain name for blockcheck.
 
 ## v1.0 → v1.1
