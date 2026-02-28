@@ -92,14 +92,266 @@ send_metrics() {
   echo -e "  ${cyan}Telegram  ${white}https://t.me/keiftco${reset}"
 }
 
+start_service() {
+  local service_name="${1}"
+
+  if command -v systemctl &>/dev/null; then
+    sudo systemctl start "${service_name}" &>"${log_redirects}"
+  elif command -v sv &>/dev/null; then
+    sudo sv start "${service_name}" &>"${log_redirects}"
+  elif command -v rc-service &>/dev/null; then
+    sudo rc-service "${service_name}" start &>"${log_redirects}"
+  elif command -v rcctl &>/dev/null; then
+    sudo rcctl start "${service_name}" &>"${log_redirects}"
+  elif command -v service &>/dev/null; then
+    sudo service "${service_name}" start &>"${log_redirects}"
+  elif [ -x "/etc/init.d/${service_name}" ]; then
+    sudo "/etc/init.d/${service_name}" start &>"${log_redirects}"
+  else
+    echo -e "  ${red}Error: Unsupported init service.${reset}"
+    echo ""
+
+    exit 1
+  fi
+}
+
+stop_service() {
+  local service_name="${1}"
+
+  if command -v systemctl &>/dev/null; then
+    sudo systemctl stop "${service_name}" &>"${log_redirects}"
+  elif command -v sv &>/dev/null; then
+    sudo sv stop "${service_name}" &>"${log_redirects}"
+  elif command -v rc-service &>/dev/null; then
+    sudo rc-service "${service_name}" stop &>"${log_redirects}"
+  elif command -v rcctl &>/dev/null; then
+    sudo rcctl stop "${service_name}" &>"${log_redirects}"
+  elif command -v service &>/dev/null; then
+    sudo service "${service_name}" stop &>"${log_redirects}"
+  elif [ -x "/etc/init.d/${service_name}" ]; then
+    sudo "/etc/init.d/${service_name}" stop &>"${log_redirects}"
+  else
+    echo -e "  ${red}Error: Unsupported init service.${reset}"
+    echo ""
+
+    exit 1
+  fi
+}
+
+restart_service() {
+  local service_name="${1}"
+
+  if command -v systemctl &>/dev/null; then
+    sudo systemctl restart "${service_name}" &>"${log_redirects}"
+  elif command -v sv &>/dev/null; then
+    sudo sv restart "${service_name}" &>"${log_redirects}"
+  elif command -v rc-service &>/dev/null; then
+    sudo rc-service "${service_name}" restart &>"${log_redirects}"
+  elif command -v rcctl &>/dev/null; then
+    sudo rcctl restart "${service_name}" &>"${log_redirects}"
+  elif command -v service &>/dev/null; then
+    sudo service "${service_name}" restart &>"${log_redirects}"
+  elif [ -x "/etc/init.d/${service_name}" ]; then
+    sudo "/etc/init.d/${service_name}" restart &>"${log_redirects}"
+  else
+    echo -e "  ${red}Error: Unsupported init service.${reset}"
+    echo ""
+
+    exit 1
+  fi
+}
+
+enable_service() {
+  local service_name="${1}"
+
+  if command -v systemctl &>/dev/null; then
+    sudo systemctl enable "${service_name}" &>"${log_redirects}"
+  elif command -v sv &>/dev/null; then
+    sudo ln -sf "/etc/sv/${service_name}" /var/service/ &>"${log_redirects}"
+  elif command -v rc-service &>/dev/null; then
+    sudo rc-update add "${service_name}" default &>"${log_redirects}"
+  elif command -v rcctl &>/dev/null; then
+    sudo rcctl enable "${service_name}" &>"${log_redirects}"
+  elif command -v sysrc &>/dev/null; then
+    sudo sysrc "${service_name}_enable=YES" &>"${log_redirects}"
+  elif command -v service &>/dev/null; then
+    if command -v update-rc.d &>/dev/null; then
+      sudo update-rc.d "${service_name}" defaults &>"${log_redirects}"
+    elif command -v chkconfig &>/dev/null; then
+      sudo chkconfig "${service_name}" on &>"${log_redirects}"
+    else
+      echo -e "  ${red}Error: Cannot find chkconfig or update-rc.d to enable service.${reset}"
+      echo ""
+      exit 1
+    fi
+  elif [ -x "/etc/init.d/${service_name}" ]; then
+    sudo "/etc/init.d/${service_name}" enable &>"${log_redirects}"
+  else
+    echo -e "  ${red}Error: Unsupported init service.${reset}"
+    echo ""
+
+    exit 1
+  fi
+}
+
+init_zapret() {
+  if command -v sv &>/dev/null; then
+    sudo mkdir -p /etc/sv/zapret
+
+    sudo tee /etc/sv/zapret/run &>/dev/null << 'EOF'
+#!/bin/sh
+
+/opt/zapret/init.d/sysv/zapret start
+exec chpst -b zapret pause
+EOF
+
+    sudo tee /etc/sv/zapret/finish &>/dev/null << 'EOF'
+#!/bin/sh
+
+/opt/zapret/init.d/sysv/zapret stop
+EOF
+
+  sudo chmod +x /etc/sv/zapret/run /etc/sv/zapret/finish
+  sudo ln -sf /etc/sv/zapret /var/service
+  elif command -v rcctl &>/dev/null; then
+    sudo tee /etc/rc.d/zapret &>/dev/null << 'EOF'
+#!/bin/ksh
+
+daemon="/opt/zapret/init.d/sysv/zapret"
+
+. /etc/rc.d/rc.subr
+
+rc_start() {
+  ${daemon} start
+}
+
+rc_stop() {
+  ${daemon} stop
+}
+
+rc_cmd "${1}"
+EOF
+
+    sudo chmod +x /etc/rc.d/zapret
+    sudo rcctl enable zapret &>"${log_redirects}"
+  elif command -v sysrc &>/dev/null; then
+    sudo ln -sf /opt/zapret/init.d/sysv/zapret /usr/local/etc/rc.d/zapret
+    sudo sysrc zapret_enable="YES" &>"${log_redirects}"
+  elif command -v service &>/dev/null; then
+    sudo ln -sf /opt/zapret/init.d/sysv/zapret /etc/init.d/zapret
+
+    if command -v update-rc.d &>/dev/null; then
+      sudo update-rc.d zapret defaults &>"${log_redirects}"
+    elif command -v chkconfig &>/dev/null; then
+      sudo chkconfig zapret on &>"${log_redirects}"
+    fi
+  fi
+}
+
+install_package() {
+  local package_name="${1}"
+
+  if command -v apt &>/dev/null; then
+    sudo apt install -y "${package_name}" &>"${log_redirects}"
+  elif command -v dnf &>/dev/null; then
+    sudo dnf install -y "${package_name}" &>"${log_redirects}"
+  elif command -v pacman &>/dev/null; then
+    sudo pacman -S --noconfirm "${package_name}" &>"${log_redirects}"
+  elif command -v xbps-install &>/dev/null; then
+    sudo xbps-install -y "${package_name}" &>"${log_redirects}"
+  elif command -v zypper &>/dev/null; then
+    sudo zypper -n install "${package_name}" &>"${log_redirects}"
+  elif command -v apk &>/dev/null; then
+    sudo apk add --quiet "${package_name}" &>"${log_redirects}"
+  elif command -v emerge &>/dev/null; then
+    sudo emerge --quiet "${package_name}" &>"${log_redirects}"
+  elif command -v pkg &>/dev/null; then
+    sudo pkg install -y "${package_name}" &>"${log_redirects}"
+  elif command -v pkg_add &>/dev/null; then
+    sudo pkg_add -I "${package_name}" &>"${log_redirects}"
+  elif command -v opkg &>/dev/null; then
+    sudo opkg install "${package_name}" &>"${log_redirects}"
+  else
+    echo -e "  ${red}Error: Unsupported package manager.${reset}"
+    echo ""
+
+    exit 1
+  fi
+}
+
+remove_package() {
+  local package_name="${1}"
+
+  if command -v apt &>/dev/null; then
+    sudo apt purge -y "${package_name}" &>"${log_redirects}"
+  elif command -v dnf &>/dev/null; then
+    sudo dnf remove -y "${package_name}" &>"${log_redirects}"
+  elif command -v pacman &>/dev/null; then
+    sudo pacman -Rns --noconfirm "${package_name}" &>"${log_redirects}"
+  elif command -v xbps-remove &>/dev/null; then
+    sudo xbps-remove -y "${package_name}" &>"${log_redirects}"
+  elif command -v zypper &>/dev/null; then
+    sudo zypper -n remove "${package_name}" &>"${log_redirects}"
+  elif command -v apk &>/dev/null; then
+    sudo apk del --quiet "${package_name}" &>"${log_redirects}"
+  elif command -v emerge &>/dev/null; then
+    sudo emerge --unmerge --quiet "${package_name}" &>"${log_redirects}"
+  elif command -v pkg &>/dev/null; then
+    sudo pkg delete -y "${package_name}" &>"${log_redirects}"
+  elif command -v pkg_delete &>/dev/null; then
+    sudo pkg_delete "${package_name}" &>"${log_redirects}"
+  elif command -v opkg &>/dev/null; then
+    sudo opkg remove "${package_name}" &>"${log_redirects}"
+  else
+    echo -e "  ${red}Error: Unsupported package manager.${reset}"
+    echo ""
+
+    exit 1
+  fi
+}
+
+update_packages() {
+  if command -v apt &>/dev/null; then
+    export DEBIAN_FRONTEND="noninteractive"
+
+    sudo apt update -y &>"${log_redirects}"
+  elif command -v dnf &>/dev/null; then
+    sudo dnf makecache -y &>"${log_redirects}"
+  elif command -v pacman &>/dev/null; then
+    sudo pacman -Syu --noconfirm &>"${log_redirects}"
+  elif command -v xbps-install &>/dev/null; then
+    sudo xbps-install -Suy &>"${log_redirects}"
+  elif command -v zypper &>/dev/null; then
+    sudo zypper -n refresh &>"${log_redirects}"
+  elif command -v apk &>/dev/null; then
+    sudo apk update --quiet &>"${log_redirects}"
+  elif command -v emerge &>/dev/null; then
+    sudo emerge --sync --quiet &>"${log_redirects}"
+  elif command -v pkg &>/dev/null; then
+    sudo pkg update &>"${log_redirects}"
+  elif command -v pkg_add &>/dev/null; then
+    sudo pkg_add -u &>"${log_redirects}"
+  elif command -v opkg &>/dev/null; then
+    sudo opkg update &>"${log_redirects}"
+  else
+    echo -e "  ${red}Error: Unsupported package manager.${reset}"
+    echo ""
+
+    exit 1
+  fi
+}
+
 clear
 
 echo ""
 echo -e "  ${blue}Keift ${cyan}Install Zapret${reset}"
 echo ""
 
-if ! command -v systemctl &>/dev/null; then
-  echo -e "  ${red}Error: This only works on Systemd devices.${reset}"
+if ! command -v systemctl &>/dev/null \
+  && ! command -v sv &>/dev/null \
+  && ! command -v rc-service &>/dev/null \
+  && ! command -v service &>/dev/null; then
+  echo -e "  ${red}Error: Unsupported init service.${reset}"
   echo ""
 
   exit 1
@@ -109,88 +361,37 @@ fi
 
 echo -e "  ${gray}Installing dependencies...${reset}"
 
-if command -v apt &>/dev/null; then
-  export DEBIAN_FRONTEND="noninteractive"
+update_packages
 
-  sudo apt update -y &>"${log_redirects}"
-
-  sudo apt install -y bind9-dnsutils &>"${log_redirects}"
-  sudo apt install -y curl &>"${log_redirects}"
-  sudo apt install -y jq &>"${log_redirects}"
-  sudo apt install -y nftables &>"${log_redirects}"
-  sudo apt install -y unzip &>"${log_redirects}"
-  sudo apt install -y wget &>"${log_redirects}"
-elif command -v dnf &>/dev/null; then
-  sudo dnf makecache -y &>"${log_redirects}"
-
-  sudo dnf install -y bind-utils &>"${log_redirects}"
-  sudo dnf install -y curl &>"${log_redirects}"
-  sudo dnf install -y jq &>"${log_redirects}"
-  sudo dnf install -y nftables &>"${log_redirects}"
-  sudo dnf install -y unzip &>"${log_redirects}"
-  sudo dnf install -y wget &>"${log_redirects}"
-elif command -v pacman &>/dev/null; then
-  sudo pacman -Syu --noconfirm &>"${log_redirects}"
-
-  sudo pacman -S --noconfirm bind &>"${log_redirects}"
-  sudo pacman -S --noconfirm curl &>"${log_redirects}"
-  sudo pacman -S --noconfirm jq &>"${log_redirects}"
-  sudo pacman -S --noconfirm nftables &>"${log_redirects}"
-  sudo pacman -S --noconfirm unzip &>"${log_redirects}"
-  sudo pacman -S --noconfirm wget &>"${log_redirects}"
-elif command -v zypper &>/dev/null; then
-  sudo zypper -n refresh &>"${log_redirects}"
-
-  sudo zypper -n install bind-utils &>"${log_redirects}"
-  sudo zypper -n install curl &>"${log_redirects}"
-  sudo zypper -n install jq &>"${log_redirects}"
-  sudo zypper -n install nftables &>"${log_redirects}"
-  sudo zypper -n install unzip &>"${log_redirects}"
-  sudo zypper -n install wget &>"${log_redirects}"
-else
-  echo -e "  ${red}Error: Unsupported package manager.${reset}"
-  echo ""
-
-  exit 1
-fi
+install_package bind9-dnsutils
+install_package bind-utils
+install_package bind
+install_package curl
+install_package jq
+install_package nftables
+install_package unzip
+install_package wget
 
 # 2. Change DNS settings
 
 echo -e "  ${gray}DNS settings are being changed...${reset}"
 
-if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
-  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
-  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"${log_redirects}" \
-  || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1001 &>"${log_redirects}"; then
-  if command -v apt &>/dev/null; then
-    sudo apt install -y systemd-resolved &>"${log_redirects}"
+if command -v systemctl &>/dev/null; then
+  if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
+    || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
+    || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"${log_redirects}" \
+    || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1001 &>"${log_redirects}"; then
+    dns_resolver="systemd-resolved"
 
-    sudo apt purge -y dnscrypt-proxy &>"${log_redirects}"
-  elif command -v dnf &>/dev/null; then
-    sudo dnf install -y systemd-resolved &>"${log_redirects}"
+    update_packages
 
-    sudo dnf remove -y dnscrypt-proxy &>"${log_redirects}"
-  elif command -v pacman &>/dev/null; then
-    sudo pacman -S --noconfirm systemd-resolved &>"${log_redirects}"
+    install_package systemd-resolved
+    remove_package dnscrypt-proxy
 
-    sudo pacman -Rns --noconfirm dnscrypt-proxy &>"${log_redirects}"
-  elif command -v zypper &>/dev/null; then
-    sudo zypper -n install systemd-resolved &>"${log_redirects}"
+    enable_service systemd-resolved
+    start_service systemd-resolved
 
-    sudo zypper -n remove -u dnscrypt-proxy &>"${log_redirects}"
-  else
-    echo -e "  ${red}Error: Unsupported package manager.${reset}"
-    echo ""
-
-    exit 1
-  fi
-
-  dns_resolver="systemd-resolved"
-
-  sudo systemctl enable systemd-resolved &>"${log_redirects}"
-  sudo systemctl start systemd-resolved
-
-  sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
+    sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
 [Resolve]
 DNS=1.1.1.1#one.one.one.one
 DNS=2606:4700:4700::1111#one.one.one.one
@@ -200,40 +401,26 @@ DNS=2606:4700:4700::1001#one.one.one.one
 DNSOverTLS=yes
 EOF
 
-  sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
+    sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
 
-  [ -e /run/systemd/resolve/stub-resolv.conf ] && sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+    [ -e /run/systemd/resolve/stub-resolv.conf ] && sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-  sudo systemctl restart systemd-resolved
-else
-  if command -v apt &>/dev/null; then
-    sudo apt install -y systemd-resolved &>"${log_redirects}"
-    sudo apt install -y dnscrypt-proxy &>"${log_redirects}"
-  elif command -v dnf &>/dev/null; then
-    sudo dnf install -y systemd-resolved &>"${log_redirects}"
-    sudo dnf install -y dnscrypt-proxy &>"${log_redirects}"
-  elif command -v pacman &>/dev/null; then
-    sudo pacman -S --noconfirm systemd-resolved &>"${log_redirects}"
-    sudo pacman -S --noconfirm dnscrypt-proxy &>"${log_redirects}"
-  elif command -v zypper &>/dev/null; then
-    sudo zypper -n install systemd-resolved &>"${log_redirects}"
-    sudo zypper -n install dnscrypt-proxy &>"${log_redirects}"
+    restart_service systemd-resolved
   else
-    echo -e "  ${red}Error: Unsupported package manager.${reset}"
-    echo ""
+    dns_resolver="dnscrypt-proxy"
 
-    exit 1
-  fi
+    update_packages
 
-  dns_resolver="dnscrypt-proxy"
+    install_package systemd-resolved
+    install_package dnscrypt-proxy
 
-  sudo systemctl enable systemd-resolved &>"${log_redirects}"
-  sudo systemctl start systemd-resolved
+    enable_service systemd-resolved
+    start_service systemd-resolved
 
-  sudo systemctl enable dnscrypt-proxy &>"${log_redirects}"
-  sudo systemctl start dnscrypt-proxy
+    enable_service dnscrypt-proxy
+    start_service dnscrypt-proxy
 
-  sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
+    sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
 [Resolve]
 DNS=127.0.0.1:5300
 DNS=[::1]:5300
@@ -241,13 +428,13 @@ DNS=[::1]:5300
 DNSOverTLS=no
 EOF
 
-  sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
+    sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
 
-  [ -e /run/systemd/resolve/stub-resolv.conf ] && sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+    [ -e /run/systemd/resolve/stub-resolv.conf ] && sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-  sudo systemctl restart systemd-resolved
+    restart_service systemd-resolved
 
-  sudo tee /etc/dnscrypt-proxy/dnscrypt-proxy.toml &>/dev/null << EOF
+    sudo tee /etc/dnscrypt-proxy/dnscrypt-proxy.toml &>/dev/null << EOF
 listen_addresses = ["127.0.0.1:5300", "[::1]:5300"]
 
 server_names = ["cloudflare", "cloudflare-ipv6"]
@@ -259,7 +446,43 @@ server_names = ["cloudflare", "cloudflare-ipv6"]
   cache_file = "/var/cache/dnscrypt-proxy/public-resolvers-v3.md"
 EOF
 
-  sudo systemctl restart dnscrypt-proxy
+    restart_service dnscrypt-proxy
+  fi
+else
+  dns_resolver="dnscrypt-proxy"
+
+  update_packages
+
+  install_package dnscrypt-proxy
+
+  enable_service dnscrypt-proxy
+  start_service dnscrypt-proxy
+
+  sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
+
+  sudo tee /etc/resolv.conf &>/dev/null << EOF
+nameserver 127.0.0.1
+nameserver ::1
+
+nameserver 1.1.1.1
+nameserver 2606:4700:4700::1111
+nameserver 1.0.0.1
+nameserver 2606:4700:4700::1001
+EOF
+
+  sudo tee /etc/dnscrypt-proxy/dnscrypt-proxy.toml &>/dev/null << EOF
+listen_addresses = ["127.0.0.1:53", "[::1]:53"]
+
+server_names = ["cloudflare", "cloudflare-ipv6"]
+
+[sources]
+  [sources."public-resolvers"]
+  urls = ["https://raw.github.com/DNSCrypt/dnscrypt-resolvers/master/v3/public-resolvers.md", "https://download.dnscrypt.info/resolvers-list/v3/public-resolvers.md"]
+  minisign_key = "RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3"
+  cache_file = "/var/cache/dnscrypt-proxy/public-resolvers-v3.md"
+EOF
+
+  restart_service dnscrypt-proxy
 fi
 
 # 3. Download Zapret
@@ -340,31 +563,6 @@ else
   nfqws_options=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/{n;:a;/^[[:space:]]*$/q;p;n;ba}" | grep -E "curl_test_http|curl_test_https_tls12" | grep "ipv4 ${blockcheck_domain} : nfqws" | tail -n 5 | head -n 1 | sed "s/.*nfqws //" | sed "s|/tmp/zapret|/opt/zapret|g" | sed "s/[[:space:]]*\$//")
 fi
 
-if echo "${blockcheck_results}" | grep -q "nftables queue support is not available"; then
-  printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
-  sudo rm -rf /opt/zapret
-  sudo rm -rf /tmp/zapret
-
-  echo -e "  ${red}Error: You need to update your system.${reset}"
-
-  if command -v apt &>/dev/null; then
-    echo -e "         ${red}Use: ${white}sudo apt update -y${reset}"
-    echo -e "              ${white}sudo apt upgrade -y${reset}"
-  elif command -v dnf &>/dev/null; then
-    echo -e "         ${red}Use: ${white}sudo dnf makecache -y${reset}"
-    echo -e "              ${white}sudo dnf upgrade -y${reset}"
-  elif command -v pacman &>/dev/null; then
-    echo -e "         ${red}Use: ${white}sudo pacman -Syu --noconfirm${reset}"
-  elif command -v zypper &>/dev/null; then
-    echo -e "         ${red}Use: ${white}sudo zypper -n refresh${reset}"
-    echo -e "              ${white}sudo zypper -n update${reset}"
-  fi
-
-  echo ""
-
-  exit 1
-fi
-
 if echo "${blockcheck_results}" | grep -q "curl_test_http ipv4 ${blockcheck_domain} : working without bypass" \
   && echo "${blockcheck_results}" | grep -q "curl_test_https_tls12 ipv4 ${blockcheck_domain} : working without bypass"; then
   printf "\n" | sudo /opt/zapret/uninstall_easy.sh &>"${log_redirects}"
@@ -384,7 +582,12 @@ fi
 
 echo -e "  ${gray}Installing Zapret...${reset}"
 
-printf "Y\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
+if command -v systemctl \
+  || command -v rc-service; then
+  printf "Y\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
+else
+  printf "Y\nY\nY\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
+fi
 
 sudo sed -i "/^NFQWS_OPT=\"/,/^\"/c NFQWS_OPT=\"${nfqws_options} --hostlist=/opt/zapret/hostlist.txt --hostlist-auto=/opt/zapret/ipset/zapret-hostlist-auto.txt\"" /opt/zapret/config
 
@@ -418,7 +621,9 @@ roblox.com
 # Others
 EOF
 
-sudo systemctl restart zapret
+init_zapret
+
+restart_service zapret
 
 i=1
 while [ "${i}" -le 10 ]; do
