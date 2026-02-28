@@ -10,6 +10,7 @@
   - **Initd init support.** Respect for Initd init.
   - **XBPS package manager support.** Respect for XBPS package manager.
   - **Emerge package manager support.** Respect for Emerge package manager.
+  - **PKG package manager support.** Respect for PKG package manager.
   - **PKG_ADD package manager support.** Respect for PKG_ADD package manager.
   - **OPKG package manager support.** Respect for OPKG package manager.
   - **Multiple blockchecks.** It attempts to find the most suitable domain name for blockcheck.
