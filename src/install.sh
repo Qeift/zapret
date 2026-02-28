@@ -273,10 +273,10 @@ install_package() {
     sudo dnf install -y "${package_name}" &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
     sudo pacman -S --noconfirm "${package_name}" &>"${log_redirects}"
-  elif command -v xbps-install &>/dev/null; then
-    sudo xbps-install -y "${package_name}" &>"${log_redirects}"
   elif command -v zypper &>/dev/null; then
     sudo zypper -n install "${package_name}" &>"${log_redirects}"
+  elif command -v xbps-install &>/dev/null; then
+    sudo xbps-install -y "${package_name}" &>"${log_redirects}"
   elif command -v apk &>/dev/null; then
     sudo apk add --quiet "${package_name}" &>"${log_redirects}"
   elif command -v emerge &>/dev/null; then
@@ -304,10 +304,10 @@ remove_package() {
     sudo dnf remove -y "${package_name}" &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
     sudo pacman -Rns --noconfirm "${package_name}" &>"${log_redirects}"
-  elif command -v xbps-remove &>/dev/null; then
-    sudo xbps-remove -y "${package_name}" &>"${log_redirects}"
   elif command -v zypper &>/dev/null; then
     sudo zypper -n remove "${package_name}" &>"${log_redirects}"
+  elif command -v xbps-remove &>/dev/null; then
+    sudo xbps-remove -y "${package_name}" &>"${log_redirects}"
   elif command -v apk &>/dev/null; then
     sudo apk del --quiet "${package_name}" &>"${log_redirects}"
   elif command -v emerge &>/dev/null; then
@@ -335,10 +335,10 @@ update_packages() {
     sudo dnf makecache -y &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
     sudo pacman -Syu --noconfirm &>"${log_redirects}"
-  elif command -v xbps-install &>/dev/null; then
-    sudo xbps-install -Suy &>"${log_redirects}"
   elif command -v zypper &>/dev/null; then
     sudo zypper -n refresh &>"${log_redirects}"
+  elif command -v xbps-install &>/dev/null; then
+    sudo xbps-install -Suy &>"${log_redirects}"
   elif command -v apk &>/dev/null; then
     sudo apk update --quiet &>"${log_redirects}"
   elif command -v emerge &>/dev/null; then
