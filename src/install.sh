@@ -386,7 +386,9 @@ install_package wget
 
 echo -e "  ${gray}DNS settings are being changed...${reset}"
 
-if command -v systemctl &>/dev/null && ! command -v pihole &>/dev/null && ! command -v pihole-FTL &>/dev/null; then
+if command -v pihole &>/dev/null || command -v pihole-FTL &>/dev/null; then
+  dns_resolver="pihole"
+elif command -v systemctl &>/dev/null; then
   if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"${log_redirects}" \
