@@ -500,6 +500,15 @@ else
   enable_service dnscrypt-proxy
   start_service dnscrypt-proxy
 
+  sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
+
+  sudo tee /etc/resolv.conf &>/dev/null << EOF
+nameserver 1.1.1.1
+nameserver 2606:4700:4700::1111
+nameserver 1.0.0.1
+nameserver 2606:4700:4700::1001
+EOF
+
   sudo tee /etc/dnscrypt-proxy/dnscrypt-proxy.toml &>/dev/null << EOF
 listen_addresses = ["127.0.0.1:53", "[::1]:53"]
 
