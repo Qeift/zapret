@@ -370,11 +370,17 @@ install_package bind9-dnsutils
 install_package bind-utils
 install_package bind-tools
 install_package bind
+install_package net-dns/bind-tools
 install_package curl
+install_package net-misc/curl
 install_package jq
+install_package app-misc/jq
 install_package nftables
+install_package net-firewall/nftables
 install_package unzip
+install_package app-arch/unzip
 install_package wget
+install_package net-misc/wget
 
 # 2. Change DNS settings
 
