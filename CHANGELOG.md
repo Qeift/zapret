@@ -7,7 +7,6 @@
   - **OpenRC init support.** Respect for OpenRC init.
   - **OpenBSD init support.** Respect for OpenBSD init.
   - **SysVinit init support.** Respect for SysVinit init.
-  - **Initd init support.** Respect for Initd init.
   - **XBPS package manager support.** Respect for XBPS package manager.
   - **Emerge package manager support.** Respect for Emerge package manager.
   - **PKG package manager support.** Respect for PKG package manager.
