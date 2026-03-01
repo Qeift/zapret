@@ -592,7 +592,7 @@ EOF
   sudo chattr +i /etc/resolv.conf &>"${log_redirects}"
 fi
 
-while ! dig +tries=1 &>/dev/null; do sleep 1; done
+while ! dig +tries=1 &>/dev/null; do restart_service dnscrypt-proxy; sleep 1; done
 
 # 3. Download Zapret
 
