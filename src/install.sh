@@ -60,13 +60,13 @@ send_metrics() {
     local blockcheck_results_filtered=$(echo "${blockcheck_results}" | sed -n "/^\* SUMMARY/{n;:a;/^[[:space:]]*$/q;p;n;ba}")
     local domain_response=$(curl --max-time 10 -sS -I "https://${blockcheck_domain}" 2>&1 | head -n 1)
 
-    if command -v "sudo systemctl" &>/dev/null; then
+    if command -v systemctl &>/dev/null; then
       init_system="Systemd"
-    elif command -v "sudo sv" &>/dev/null; then
+    elif command -v sv &>/dev/null; then
       init_system="Runit"
-    elif command -v "sudo rc-service" &>/dev/null; then
+    elif command -v rc-service &>/dev/null; then
       init_system="OpenRC"
-    elif command -v "sudo rcctl" &>/dev/null; then
+    elif command -v rcctl &>/dev/null; then
       init_system="OpenBSD"
     elif command -v "sudo service" &>/dev/null; then
       init_system="SysvInit"
@@ -115,13 +115,13 @@ send_metrics() {
 start_service() {
   local service_name="${1}"
 
-  if command -v "sudo systemctl" &>/dev/null; then
+  if command -v systemctl &>/dev/null; then
     sudo systemctl start "${service_name}" &>"${log_redirects}"
-  elif command -v "sudo sv" &>/dev/null; then
+  elif command -v sv &>/dev/null; then
     sudo sv start "${service_name}" &>"${log_redirects}"
-  elif command -v "sudo rc-service" &>/dev/null; then
+  elif command -v rc-service &>/dev/null; then
     sudo rc-service "${service_name}" start &>"${log_redirects}"
-  elif command -v "sudo rcctl" &>/dev/null; then
+  elif command -v rcctl &>/dev/null; then
     sudo rcctl start "${service_name}" &>"${log_redirects}"
   elif command -v "sudo service" &>/dev/null; then
     sudo service "${service_name}" start &>"${log_redirects}"
@@ -138,13 +138,13 @@ start_service() {
 stop_service() {
   local service_name="${1}"
 
-  if command -v "sudo systemctl" &>/dev/null; then
+  if command -v systemctl &>/dev/null; then
     sudo systemctl stop "${service_name}" &>"${log_redirects}"
-  elif command -v "sudo sv" &>/dev/null; then
+  elif command -v sv &>/dev/null; then
     sudo sv stop "${service_name}" &>"${log_redirects}"
-  elif command -v "sudo rc-service" &>/dev/null; then
+  elif command -v rc-service &>/dev/null; then
     sudo rc-service "${service_name}" stop &>"${log_redirects}"
-  elif command -v "sudo rcctl" &>/dev/null; then
+  elif command -v rcctl &>/dev/null; then
     sudo rcctl stop "${service_name}" &>"${log_redirects}"
   elif command -v "sudo service" &>/dev/null; then
     sudo service "${service_name}" stop &>"${log_redirects}"
@@ -161,13 +161,13 @@ stop_service() {
 restart_service() {
   local service_name="${1}"
 
-  if command -v "sudo systemctl" &>/dev/null; then
+  if command -v systemctl &>/dev/null; then
     sudo systemctl restart "${service_name}" &>"${log_redirects}"
-  elif command -v "sudo sv" &>/dev/null; then
+  elif command -v sv &>/dev/null; then
     sudo sv restart "${service_name}" &>"${log_redirects}"
-  elif command -v "sudo rc-service" &>/dev/null; then
+  elif command -v rc-service &>/dev/null; then
     sudo rc-service "${service_name}" restart &>"${log_redirects}"
-  elif command -v "sudo rcctl" &>/dev/null; then
+  elif command -v rcctl &>/dev/null; then
     sudo rcctl restart "${service_name}" &>"${log_redirects}"
   elif command -v "sudo service" &>/dev/null; then
     sudo service "${service_name}" restart &>"${log_redirects}"
@@ -184,20 +184,20 @@ restart_service() {
 enable_service() {
   local service_name="${1}"
 
-  if command -v "sudo systemctl" &>/dev/null; then
+  if command -v systemctl &>/dev/null; then
     sudo systemctl enable "${service_name}" &>"${log_redirects}"
-  elif command -v "sudo sv" &>/dev/null; then
+  elif command -v sv &>/dev/null; then
     sudo ln -sf "/etc/sv/${service_name}" /var/service/ &>"${log_redirects}"
-  elif command -v "sudo rc-service" &>/dev/null; then
+  elif command -v rc-service &>/dev/null; then
     sudo rc-update add "${service_name}" default &>"${log_redirects}"
-  elif command -v "sudo rcctl" &>/dev/null; then
+  elif command -v rcctl &>/dev/null; then
     sudo rcctl enable "${service_name}" &>"${log_redirects}"
-  elif command -v "sudo sysrc" &>/dev/null; then
+  elif command -v sysrc &>/dev/null; then
     sudo sysrc "${service_name}_enable=YES" &>"${log_redirects}"
   elif command -v "sudo service" &>/dev/null; then
-    if command -v "sudo update-rc.d" &>/dev/null; then
+    if command -v update-rc.d &>/dev/null; then
       sudo update-rc.d "${service_name}" defaults &>"${log_redirects}"
-    elif command -v "sudo chkconfig" &>/dev/null; then
+    elif command -v chkconfig &>/dev/null; then
       sudo chkconfig "${service_name}" on &>"${log_redirects}"
     else
       echo -e "  ${red}Error: Cannot find chkconfig or update-rc.d to enable service.${reset}"
@@ -215,7 +215,7 @@ enable_service() {
 }
 
 init_zapret() {
-  if command -v "sudo sv" &>/dev/null; then
+  if command -v sv &>/dev/null; then
     sudo mkdir -p /etc/sv/zapret
 
     sudo tee /etc/sv/zapret/run &>/dev/null << EOF
@@ -234,7 +234,7 @@ EOF
     sudo chmod +x /etc/sv/zapret/run /etc/sv/zapret/finish
 
     sudo ln -sf /etc/sv/zapret /var/service
-  elif command -v "sudo rcctl" &>/dev/null; then
+  elif command -v rcctl &>/dev/null; then
     sudo tee /etc/rc.d/zapret &>/dev/null << 'EOF'
 #!/bin/ksh
 
@@ -256,15 +256,15 @@ EOF
     sudo chmod +x /etc/rc.d/zapret
 
     sudo rcctl enable zapret &>"${log_redirects}"
-  elif command -v "sudo sysrc" &>/dev/null; then
+  elif command -v sysrc &>/dev/null; then
     sudo ln -sf /opt/zapret/init.d/sysv/zapret /usr/local/etc/rc.d/zapret
     sudo sysrc zapret_enable="YES" &>"${log_redirects}"
   elif command -v "sudo service" &>/dev/null; then
     sudo ln -sf /opt/zapret/init.d/sysv/zapret /etc/init.d/zapret
 
-    if command -v "sudo update-rc.d" &>/dev/null; then
+    if command -v update-rc.d &>/dev/null; then
       sudo update-rc.d zapret defaults &>"${log_redirects}"
-    elif command -v "sudo chkconfig" &>/dev/null; then
+    elif command -v chkconfig &>/dev/null; then
       sudo chkconfig zapret on &>"${log_redirects}"
     fi
   fi
@@ -389,7 +389,7 @@ install_package wget
 
 echo -e "  ${gray}DNS settings are being changed...${reset}"
 
-if command -v "sudo systemctl" &>/dev/null && ! command -v pihole &>/dev/null && ! command -v pihole-FTL &>/dev/null; then
+if command -v systemctl &>/dev/null && ! command -v pihole &>/dev/null && ! command -v pihole-FTL &>/dev/null; then
   if [ "${dnscrypt}" = false ] \
     && ( dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
@@ -682,8 +682,8 @@ fi
 
 echo -e "  ${gray}Installing Zapret...${reset}"
 
-if command -v "sudo systemctl" &>/dev/null \
-  || command -v "sudo rc-service" &>/dev/null; then
+if command -v systemctl &>/dev/null \
+  || command -v rc-service &>/dev/null; then
   printf "Y\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
 else
   printf "Y\nY\nY\n\n\n\n\n\n\nY\n\n\n\n\n" | sudo /tmp/zapret/install_easy.sh &>"${log_redirects}"
