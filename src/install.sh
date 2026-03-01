@@ -736,7 +736,7 @@ restart_service zapret
 
 i=1
 while [ "${i}" -le 10 ]; do
-  curl --max-time 10 "https://${blockcheck_domain}" &>"${log_redirects}"
+  curl --max-time 10 "https://${blockcheck_domain}" &>/dev/null
 
   ((i++))
 done
