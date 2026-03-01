@@ -189,9 +189,9 @@ enable_service() {
   elif command -v sysrc &>/dev/null; then
     sudo sysrc "${service_name}_enable=YES" &>"${log_redirects}"
   elif command -v service &>/dev/null || [ -x /usr/sbin/service ] || [ -x /sbin/service ]; then
-    if command -v update-rc.d &>/dev/null; then
+    if command -v update-rc.d &>/dev/null || [ -x /usr/sbin/update-rc.d ] || [ -x /sbin/update-rc.d ]; then
       sudo update-rc.d "${service_name}" defaults &>"${log_redirects}"
-    elif command -v chkconfig &>/dev/null; then
+    elif command -v chkconfig &>/dev/null || [ -x /usr/sbin/chkconfig ] || [ -x /sbin/chkconfig ]; then
       sudo chkconfig "${service_name}" on &>"${log_redirects}"
     else
       echo -e "  ${red}Error: Cannot find update-rc.d or chkconfig to enable service.${reset}"
