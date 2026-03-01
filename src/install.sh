@@ -181,7 +181,7 @@ enable_service() {
   if command -v systemctl &>/dev/null; then
     sudo systemctl enable "${service_name}" &>"${log_redirects}"
   elif command -v sv &>/dev/null; then
-    sudo ln -sf "/etc/sv/${service_name}" /var/service/ &>"${log_redirects}"
+    sudo ln -sf "/etc/sv/${service_name}" /var/service &>"${log_redirects}"
   elif command -v rc-service &>/dev/null; then
     sudo rc-update add "${service_name}" default &>"${log_redirects}"
   elif command -v rcctl &>/dev/null; then
@@ -227,7 +227,7 @@ EOF
     sudo chmod +x /etc/sv/zapret/run
     sudo chmod +x /etc/sv/zapret/finish
 
-    sudo ln -sf /etc/sv/zapret /var/service
+    enable_service zapret
   elif command -v rcctl &>/dev/null; then
     sudo tee /etc/rc.d/zapret &>/dev/null << 'EOF'
 #!/bin/ksh
