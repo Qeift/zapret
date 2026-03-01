@@ -431,6 +431,7 @@ EOF
 
     install_package systemd-resolved
     install_package dnscrypt-proxy
+    install_package net-dns/dnscrypt-proxy
 
     enable_service systemd-resolved
     start_service systemd-resolved
@@ -491,6 +492,7 @@ else
   update_packages
 
   install_package dnscrypt-proxy
+  install_package net-dns/dnscrypt-proxy
 
   enable_service dnscrypt-proxy
   start_service dnscrypt-proxy
