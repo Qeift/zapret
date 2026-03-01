@@ -478,6 +478,8 @@ EOF
 DNS=127.0.0.1:5300
 DNS=[::1]:5300
 
+FallbackDNS=$(ip route show default | awk "{print \$3}" | head -n 1)
+
 FallbackDNS=1.1.1.1
 FallbackDNS=2606:4700:4700::1111
 FallbackDNS=1.0.0.1
@@ -515,10 +517,7 @@ else
   sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
 
   sudo tee /etc/resolv.conf &>/dev/null << EOF
-nameserver 1.1.1.1
-nameserver 2606:4700:4700::1111
-nameserver 1.0.0.1
-nameserver 2606:4700:4700::1001
+nameserver $(ip route show default | awk "{print \$3}" | head -n 1)
 EOF
 
   if command -v pihole &>/dev/null || command -v pihole-FTL &>/dev/null; then
@@ -581,6 +580,8 @@ EOF
     sudo tee /etc/resolv.conf &>/dev/null << EOF
 nameserver 127.0.0.1
 nameserver ::1
+
+nameserver $(ip route show default | awk "{print \$3}" | head -n 1)
 
 nameserver 1.1.1.1
 nameserver 2606:4700:4700::1111
