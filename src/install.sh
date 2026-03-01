@@ -478,6 +478,11 @@ EOF
 DNS=127.0.0.1:5300
 DNS=[::1]:5300
 
+FallbackDNS=1.1.1.1
+FallbackDNS=2606:4700:4700::1111
+FallbackDNS=1.0.0.1
+FallbackDNS=2606:4700:4700::1001
+
 Domains=~.
 DNSOverTLS=no
 EOF
