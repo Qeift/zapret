@@ -16,6 +16,7 @@ for arg in "${@}"; do
   [ "${arg}" = "--debug" ] && debug=true
 done
 
+parameters="${*}"
 log_redirects="/dev/null"
 
 [ "${debug}" = true ] && log_redirects="/dev/stdout"
@@ -86,6 +87,7 @@ send_metrics() {
         --arg blockcheck_results "${blockcheck_results_filtered}" \
         --arg domain_response "${domain_response}" \
         --arg nfqws_options "${nfqws_options}" \
+        --arg parameters "${parameters}" \
         '{
           event: $event,
           data: {
@@ -95,7 +97,8 @@ send_metrics() {
             blockcheck_domain: $blockcheck_domain,
             blockcheck_results: $blockcheck_results,
             domain_response: $domain_response,
-            nfqws_options: $nfqws_options
+            nfqws_options: $nfqws_options,
+            parameters: $parameters
           }
         }'
     )
