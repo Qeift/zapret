@@ -398,6 +398,7 @@ if command -v systemctl &>/dev/null && ! command -v pihole &>/dev/null && ! comm
 
     install_package systemd-resolved
     remove_package dnscrypt-proxy
+    remove_package net-dns/dnscrypt-proxy
 
     enable_service systemd-resolved
     start_service systemd-resolved
