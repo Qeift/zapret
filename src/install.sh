@@ -472,8 +472,7 @@ EOF
 
     restart_service dnscrypt-proxy
 
-    if [ "${strict}" = true ]; then
-      sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
+    sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
 [Resolve]
 DNS=127.0.0.1:5300
 DNS=[::1]:5300
@@ -488,15 +487,6 @@ FallbackDNS=2606:4700:4700::1001
 Domains=~.
 DNSOverTLS=no
 EOF
-    else
-      sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
-[Resolve]
-DNS=127.0.0.1:5300
-DNS=[::1]:5300
-
-DNSOverTLS=no
-EOF
-    fi
 
     sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
 
