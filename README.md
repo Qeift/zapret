@@ -18,6 +18,12 @@ You can uninstall it as follows.
 curl -fsSL https://raw.github.com/keift/zapret/refs/heads/main/src/uninstall.sh | bash
 ```
 
+## Screenshots
+
+Here it is.
+
+<img src="./assets/screenshot-1.png" width="100%"/>
+
 ## Parameters
 
 Installation settings can be changed in the following ways.
@@ -33,9 +39,3 @@ Installation settings can be changed in the following ways.
 > ```shell
 > curl -fsSL https://raw.github.com/keift/zapret/refs/heads/main/src/install.sh | bash -s -- --strict --dnscrypt --blockcheck-domain discord.com
 > ```
-
-## Screenshots
-
-Here it is.
-
-<img src="./assets/screenshot-1.png" width="100%"/>
