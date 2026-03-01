@@ -68,7 +68,7 @@ send_metrics() {
       init_system="OpenRC"
     elif command -v rcctl &>/dev/null; then
       init_system="OpenBSD"
-    elif command -v "sudo service" &>/dev/null; then
+    elif command -v service &>/dev/null || [ -x /usr/sbin/service ] || [ -x /sbin/service ]; then
       init_system="SysvInit"
     else
       init_system="Unknown"
@@ -123,10 +123,8 @@ start_service() {
     sudo rc-service "${service_name}" start &>"${log_redirects}"
   elif command -v rcctl &>/dev/null; then
     sudo rcctl start "${service_name}" &>"${log_redirects}"
-  elif command -v "sudo service" &>/dev/null; then
+  elif command -v service &>/dev/null || [ -x /usr/sbin/service ] || [ -x /sbin/service ]; then
     sudo service "${service_name}" start &>"${log_redirects}"
-  elif [ -x "/etc/init.d/${service_name}" ]; then
-    sudo "/etc/init.d/${service_name}" start &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported init system.${reset}"
     echo ""
@@ -146,10 +144,8 @@ stop_service() {
     sudo rc-service "${service_name}" stop &>"${log_redirects}"
   elif command -v rcctl &>/dev/null; then
     sudo rcctl stop "${service_name}" &>"${log_redirects}"
-  elif command -v "sudo service" &>/dev/null; then
+  elif command -v service &>/dev/null || [ -x /usr/sbin/service ] || [ -x /sbin/service ]; then
     sudo service "${service_name}" stop &>"${log_redirects}"
-  elif [ -x "/etc/init.d/${service_name}" ]; then
-    sudo "/etc/init.d/${service_name}" stop &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported init system.${reset}"
     echo ""
@@ -169,10 +165,8 @@ restart_service() {
     sudo rc-service "${service_name}" restart &>"${log_redirects}"
   elif command -v rcctl &>/dev/null; then
     sudo rcctl restart "${service_name}" &>"${log_redirects}"
-  elif command -v "sudo service" &>/dev/null; then
+  elif command -v service &>/dev/null || [ -x /usr/sbin/service ] || [ -x /sbin/service ]; then
     sudo service "${service_name}" restart &>"${log_redirects}"
-  elif [ -x "/etc/init.d/${service_name}" ]; then
-    sudo "/etc/init.d/${service_name}" restart &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported init system.${reset}"
     echo ""
@@ -194,18 +188,17 @@ enable_service() {
     sudo rcctl enable "${service_name}" &>"${log_redirects}"
   elif command -v sysrc &>/dev/null; then
     sudo sysrc "${service_name}_enable=YES" &>"${log_redirects}"
-  elif command -v "sudo service" &>/dev/null; then
+  elif command -v service &>/dev/null || [ -x /usr/sbin/service ] || [ -x /sbin/service ]; then
     if command -v update-rc.d &>/dev/null; then
       sudo update-rc.d "${service_name}" defaults &>"${log_redirects}"
     elif command -v chkconfig &>/dev/null; then
       sudo chkconfig "${service_name}" on &>"${log_redirects}"
     else
-      echo -e "  ${red}Error: Cannot find chkconfig or update-rc.d to enable service.${reset}"
+      echo -e "  ${red}Error: Cannot find update-rc.d or chkconfig to enable service.${reset}"
       echo ""
+
       exit 1
     fi
-  elif [ -x "/etc/init.d/${service_name}" ]; then
-    sudo "/etc/init.d/${service_name}" enable &>"${log_redirects}"
   else
     echo -e "  ${red}Error: Unsupported init system.${reset}"
     echo ""
@@ -259,7 +252,7 @@ EOF
   elif command -v sysrc &>/dev/null; then
     sudo ln -sf /opt/zapret/init.d/sysv/zapret /usr/local/etc/rc.d/zapret
     sudo sysrc zapret_enable="YES" &>"${log_redirects}"
-  elif command -v "sudo service" &>/dev/null; then
+  elif command -v service &>/dev/null || [ -x /usr/sbin/service ] || [ -x /sbin/service ]; then
     sudo ln -sf /opt/zapret/init.d/sysv/zapret /etc/init.d/zapret
 
     if command -v update-rc.d &>/dev/null; then
