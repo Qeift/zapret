@@ -518,6 +518,11 @@ else
 
   sudo tee /etc/resolv.conf &>/dev/null << EOF
 nameserver $(ip route show default | awk "{print \$3}" | head -n 1)
+
+nameserver 1.1.1.1
+nameserver 2606:4700:4700::1111
+nameserver 1.0.0.1
+nameserver 2606:4700:4700::1001
 EOF
 
   if command -v pihole &>/dev/null || command -v pihole-FTL &>/dev/null; then
