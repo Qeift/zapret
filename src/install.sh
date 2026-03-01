@@ -224,7 +224,8 @@ EOF
 /opt/zapret/init.d/sysv/zapret stop
 EOF
 
-    sudo chmod +x /etc/sv/zapret/run /etc/sv/zapret/finish
+    sudo chmod +x /etc/sv/zapret/run
+    sudo chmod +x /etc/sv/zapret/finish
 
     sudo ln -sf /etc/sv/zapret /var/service
   elif command -v rcctl &>/dev/null; then
@@ -248,18 +249,15 @@ EOF
 
     sudo chmod +x /etc/rc.d/zapret
 
-    sudo rcctl enable zapret &>"${log_redirects}"
+    enable_service zapret
   elif command -v sysrc &>/dev/null; then
     sudo ln -sf /opt/zapret/init.d/sysv/zapret /usr/local/etc/rc.d/zapret
-    sudo sysrc zapret_enable="YES" &>"${log_redirects}"
+
+    enable_service zapret
   elif command -v service &>/dev/null || [ -x /usr/sbin/service ] || [ -x /sbin/service ]; then
     sudo ln -sf /opt/zapret/init.d/sysv/zapret /etc/init.d/zapret
 
-    if command -v update-rc.d &>/dev/null; then
-      sudo update-rc.d zapret defaults &>"${log_redirects}"
-    elif command -v chkconfig &>/dev/null; then
-      sudo chkconfig zapret on &>"${log_redirects}"
-    fi
+    enable_service zapret
   fi
 }
 
