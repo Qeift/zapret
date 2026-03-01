@@ -38,5 +38,5 @@ Installation settings can be changed in the following ways.
 > Example:
 >
 > ```shell
-> curl -fsSL https://raw.github.com/keift/zapret/refs/heads/main/src/install.sh | bash -s -- --strict --dnscrypt --blockcheck-domain discord.com
+> curl -fsSL https://raw.github.com/keift/zapret/refs/heads/main/src/install.sh | bash -s -- --strict --dnscrypt --clean --blockcheck-domain discord.com
 > ```
