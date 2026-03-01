@@ -3,11 +3,13 @@
 sudo -v
 
 strict=false
+dnscrypt=false
 dev=false
 debug=false
 
 for arg in "${@}"; do
   [ "${arg}" = "--strict" ] && strict=true
+  [ "${arg}" = "--dnscrypt" ] && dnscrypt=true
   [ "${arg}" = "--dev" ] && dev=true
   [ "${arg}" = "--debug" ] && debug=true
 done
@@ -388,10 +390,11 @@ install_package wget
 echo -e "  ${gray}DNS settings are being changed...${reset}"
 
 if command -v systemctl &>/dev/null && ! command -v pihole &>/dev/null && ! command -v pihole-FTL &>/dev/null; then
-  if dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
+  if [ "${dnscrypt}" = false ] \
+    && ( dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
     || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"${log_redirects}" \
-    || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1001 &>"${log_redirects}"; then
+    || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1001 &>"${log_redirects}" ); then
     dns_resolver="systemd-resolved"
 
     update_packages
