@@ -393,10 +393,10 @@ echo -e "  ${gray}DNS settings are being changed...${reset}"
 
 if command -v systemctl &>/dev/null && ! command -v pihole &>/dev/null && ! command -v pihole-FTL &>/dev/null; then
   if [ "${dnscrypt}" = false ] \
-    && ( dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.1.1.1 &>"${log_redirects}" \
-    || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1111 &>"${log_redirects}" \
-    || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @1.0.0.1 &>"${log_redirects}" \
-    || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 @2606:4700:4700::1001 &>"${log_redirects}" ); then
+    && ( dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 +time=10 @1.1.1.1 &>"${log_redirects}" \
+    || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 +time=10 @2606:4700:4700::1111 &>"${log_redirects}" \
+    || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 +time=10 @1.0.0.1 &>"${log_redirects}" \
+    || dig -p 853 +tls +tls-hostname=one.one.one.one +tries=1 +time=10 @2606:4700:4700::1001 &>"${log_redirects}" ); then
     dns_resolver="systemd-resolved"
 
     update_packages
@@ -476,23 +476,26 @@ EOF
 
     restart_service dnscrypt-proxy
 
-    while ! dig -p 5300 +tries=1 @127.0.0.1 &>/dev/null; do restart_service dnscrypt-proxy; sleep 1; done
+    while ! dig -p 5300 +tries=1 +time=10 @127.0.0.1 &>/dev/null; do restart_service dnscrypt-proxy; sleep 1; done
 
-    sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
+    if [ "${strict}" = true ]; then
+      sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
 [Resolve]
 DNS=127.0.0.1:5300
 DNS=[::1]:5300
 
-FallbackDNS=$(ip route show default | awk "{print \$3}" | head -n 1)
-
-FallbackDNS=1.1.1.1
-FallbackDNS=2606:4700:4700::1111
-FallbackDNS=1.0.0.1
-FallbackDNS=2606:4700:4700::1001
-
 Domains=~.
 DNSOverTLS=no
 EOF
+    else
+      sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
+[Resolve]
+DNS=127.0.0.1:5300
+DNS=[::1]:5300
+
+DNSOverTLS=no
+EOF
+    fi
 
     sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
 
@@ -542,7 +545,7 @@ EOF
 
     restart_service dnscrypt-proxy
 
-    while ! dig -p 5300 +tries=1 @127.0.0.1 &>/dev/null; do restart_service dnscrypt-proxy; sleep 1; done
+    while ! dig -p 5300 +tries=1 +time=10 @127.0.0.1 &>/dev/null; do restart_service dnscrypt-proxy; sleep 1; done
 
     echo ""
     echo -e "  ${gray}It appears you are using ${red}Pi-hole${gray}.${reset}"
@@ -574,7 +577,7 @@ EOF
 
     restart_service dnscrypt-proxy
 
-    while ! dig -p 53 +tries=1 @127.0.0.1 &>/dev/null; do restart_service dnscrypt-proxy; sleep 1; done
+    while ! dig -p 53 +tries=1 +time=10 @127.0.0.1 &>/dev/null; do restart_service dnscrypt-proxy; sleep 1; done
   fi
 
   sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
