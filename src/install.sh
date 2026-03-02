@@ -493,6 +493,7 @@ EOF
 DNS=127.0.0.1:5300
 DNS=[::1]:5300
 
+Domains=~.
 DNSOverTLS=no
 EOF
     fi
