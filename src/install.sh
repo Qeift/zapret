@@ -734,15 +734,6 @@ discord.gift
 discord.media
 discord.new
 
-# Steam
-steampowered.com
-steamcommunity.com
-steam-chat.com
-steamcontent.com
-steamstatic.com
-steamusercontent.com
-steamserver.net
-
 # Roblox
 roblox.com
 
