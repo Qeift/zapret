@@ -476,6 +476,8 @@ EOF
 
     restart_service dnscrypt-proxy
 
+    while ! dig -p 5300 +tries=1 @127.0.0.1 &>/dev/null; do restart_service dnscrypt-proxy; sleep 1; done
+
     sudo tee /etc/systemd/resolved.conf &>/dev/null << EOF
 [Resolve]
 DNS=127.0.0.1:5300
@@ -538,6 +540,10 @@ netprobe_timeout = 60
   cache_file = "/var/cache/dnscrypt-proxy/public-resolvers-v3.md"
 EOF
 
+    restart_service dnscrypt-proxy
+
+    while ! dig -p 5300 +tries=1 @127.0.0.1 &>/dev/null; do restart_service dnscrypt-proxy; sleep 1; done
+
     echo ""
     echo -e "  ${gray}It appears you are using ${red}Pi-hole${gray}.${reset}"
     echo -e "  ${gray}Change the ${green}Custom DNS ${gray}option in the Pi-hole to: ${white}127.0.0.1#5300${reset}"
@@ -565,9 +571,11 @@ netprobe_timeout = 60
   minisign_key = "RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3"
   cache_file = "/var/cache/dnscrypt-proxy/public-resolvers-v3.md"
 EOF
-  fi
 
-  restart_service dnscrypt-proxy
+    restart_service dnscrypt-proxy
+
+    while ! dig -p 53 +tries=1 @127.0.0.1 &>/dev/null; do restart_service dnscrypt-proxy; sleep 1; done
+  fi
 
   sudo chattr -i /etc/resolv.conf &>"${log_redirects}"
 
@@ -592,8 +600,6 @@ EOF
 
   sudo chattr +i /etc/resolv.conf &>"${log_redirects}"
 fi
-
-while ! dig +tries=1 &>/dev/null; do restart_service dnscrypt-proxy; sleep 1; done
 
 # 3. Download Zapret
 
