@@ -7,7 +7,9 @@ Install Zapret in one step.
 You can install it as follows.
 
 ```shell
-curl -fsSL https://raw.github.com/keift/zapret/refs/heads/main/src/install.sh | bash
+curl -fsSL https://raw.github.com/qeift/zapret/refs/heads/main/src/install.sh | bash
+# or
+fetch -o - https://raw.githubusercontent.com/qeift/zapret/main/src/install.sh | bash
 ```
 
 ## Uninstall
@@ -15,14 +17,10 @@ curl -fsSL https://raw.github.com/keift/zapret/refs/heads/main/src/install.sh | 
 You can uninstall it as follows.
 
 ```shell
-curl -fsSL https://raw.github.com/keift/zapret/refs/heads/main/src/uninstall.sh | bash
+curl -fsSL https://raw.github.com/qeift/zapret/refs/heads/main/src/uninstall.sh | bash
+# or
+fetch -o - https://raw.githubusercontent.com/qeift/zapret/main/src/uninstall.sh | bash
 ```
-
-## Screenshots
-
-Here it is.
-
-<img src="./assets/screenshot-1.png" width="100%"/>
 
 ## Parameters
 
@@ -38,5 +36,7 @@ Installation settings can be changed in the following ways.
 > Example:
 >
 > ```shell
-> curl -fsSL https://raw.github.com/keift/zapret/refs/heads/main/src/install.sh | bash -s -- --strict --dnscrypt --clean --blockcheck-domain discord.com
+> curl -fsSL https://raw.github.com/qeift/zapret/refs/heads/main/src/install.sh | bash -s -- --strict --dnscrypt --clean --blockcheck-domain discord.com
+> # or
+> fetch -o - https://raw.github.com/qeift/zapret/refs/heads/main/src/install.sh | bash -s -- --strict --dnscrypt --clean --blockcheck-domain discord.com
 > ```
