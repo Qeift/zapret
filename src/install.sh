@@ -271,6 +271,8 @@ install_package() {
 
   if command -v apt &>/dev/null; then
     sudo apt install -y "${package_name}" &>"${log_redirects}"
+  elif command -v rpm-ostree &>/dev/null; then
+    sudo rpm-ostree install --idempotent --apply-live "${package_name}" &>"${log_redirects}"
   elif command -v dnf &>/dev/null; then
     sudo dnf install -y "${package_name}" &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
@@ -302,6 +304,8 @@ remove_package() {
 
   if command -v apt &>/dev/null; then
     sudo apt purge -y "${package_name}" &>"${log_redirects}"
+  elif command -v rpm-ostree &>/dev/null; then
+    sudo rpm-ostree uninstall "${package_name}" &>"${log_redirects}"
   elif command -v dnf &>/dev/null; then
     sudo dnf remove -y "${package_name}" &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
@@ -333,6 +337,8 @@ update_packages() {
     export DEBIAN_FRONTEND="noninteractive"
 
     sudo apt update -y &>"${log_redirects}"
+  elif command -v rpm-ostree &>/dev/null; then
+    sudo rpm-ostree upgrade &>"${log_redirects}"
   elif command -v dnf &>/dev/null; then
     sudo dnf makecache -y &>"${log_redirects}"
   elif command -v pacman &>/dev/null; then
