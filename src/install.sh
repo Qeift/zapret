@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# big bro sometimes forgets bsd systems doesnt use bash as first shell (located at /usr/local/bin/bash)
 sudo -v
 
 strict=false
